@@ -1,0 +1,3 @@
+test/fixtures/*.xls binary
+test/fixtures/*.xlsx binary
+test/fixtures/*.csv binary

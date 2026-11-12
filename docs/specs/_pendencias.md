@@ -49,3 +49,17 @@ reescrever as specs. Ajustar se o dono preferir outro estilo.
 - Teste da porta é pulado quando ~/Antigravity/PORTS.md não existe (ex.: CI) (test/segredos.test.ts)
 - Pre-commit falha de propósito sem gitleaks instalado; pode atrapalhar contribuidores do repositório público (.githooks/pre-commit)
 - Regra de CPF só pega o formato com pontuação (.gitleaks.toml)
+
+## T-02.1 — Números por posto da amostra de 12/11/2026
+
+A amostra original não está no repositório nem nesta máquina, e só os totais aparecem no PRD e na
+spec. As fixtures em `test/fixtures/` usam números **sintéticos** que mantêm o que se conhece: o
+cabeçalho, 12 postos (2.3 e 4.1 zerados), 180 pacientes dos hospitalistas, 35 da cardiologia e geriatria
+e os fatores entregues (21 médicos na semana, 10 no fim de semana; 2.3 = 1 e 4.1 = 2,5; 6.x = 2 e 1).
+O total de potenciais admissões (15) e a divisão por posto foram inventados. Se o dono quiser os
+números exatos de cada posto, basta trocar a tabela `LINHAS` em `test/fixtures/gerar.ts` e rodar
+`node test/fixtures/gerar.ts`; os nomes dos postos não identificam ninguém.
+
+## T-02.1 (rodada 1)
+
+- Números por posto e total de potenciais admissões (15) são inventados porque a amostra real não está disponível; está registrado em _pendencias.md e os totais conhecidos foram mantidos (test/fixtures/gerar.ts)

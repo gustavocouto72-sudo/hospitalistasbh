@@ -1,6 +1,6 @@
 # Tasks — SPEC-02 Leitura do relatório
 
-- [ ] **T-02.1 — Fixtures sintéticas**
+- [x] **T-02.1 — Fixtures sintéticas**
   - Depende de: T-01.3
   - Aceite:
     - `test/fixtures/relatorio-9998-latin1.xls`, com os mesmos cabeçalho, postos e números da amostra de 12/11/2026, salvo em ISO-8859-1.
