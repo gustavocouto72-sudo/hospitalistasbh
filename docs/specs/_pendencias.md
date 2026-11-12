@@ -109,3 +109,23 @@ basta tirar esse ramo e trocar a fixture por Latin-1.
 - Numeração das linhas ignora linhas em branco no meio do arquivo e pode divergir do editor (decisão registrada em _pendencias.md) (src/relatorio/ler.ts)
 - xlsx ainda devolve erro xlsx-sob-demanda; leitura real fica para a T-02.5 (src/relatorio/ler.ts)
 - textos/ importa tipo de relatorio/numeros, acoplando interface à leitura (só type import) (src/textos/index.ts)
+
+## T-02.5 — SheetJS e leitura assíncrona
+
+- **Origem do SheetJS:** `xlsx` 0.20.3 entrou em `dependencies` pelo tarball oficial
+  (`https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz`), como a própria SheetJS recomenda. A versão do
+  registro npm parou na 0.18.5, que tem avisos de segurança conhecidos. O lockfile fixa o hash. Se o
+  dono preferir só o registro npm, a troca é no `package.json`.
+- **`lerRelatorio` virou assíncrona** (`Promise<ResultadoLeitura>`), porque o `import('xlsx')` dinâmico
+  só existe assim. Texto tabulado e CSV não carregam nada além do que já carregavam.
+- **xlsx:** lê só a primeira planilha, sem fórmulas; números saem com ponto decimal, que `lerNumero` já
+  aceita. Um xlsx que o SheetJS não consegue abrir gera o erro `xlsx-ilegivel` (substitui o
+  `xlsx-sob-demanda` da T-02.4).
+- **Bundle inicial:** verificado por teste (nenhum import estático de `xlsx` em `src/`) e pelo build, que
+  não traz o SheetJS. A página ainda não usa a leitura; quando a tela de upload chegar, o SheetJS deve
+  aparecer só num chunk separado.
+
+## T-02.5 (rodada 1)
+
+- SheetJS 0.20.3 instalado pelo tarball do CDN da SheetJS, fora do registro npm (hash fixado no lockfile, escolha registrada em _pendencias.md) (package.json)
+- textoDaCelula transforma Date em texto ISO; irrelevante para as colunas do 9998, mas célula de data formatada viraria texto inesperado (src/relatorio/ler.ts)

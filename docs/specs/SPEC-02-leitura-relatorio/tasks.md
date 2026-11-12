@@ -29,7 +29,7 @@
     - Linha "Total" ignorada.
     - Todos os casos de borda da spec cobertos, com mensagens em `textos/`.
 
-- [ ] **T-02.5 — Leitura de xlsx sob demanda**
+- [x] **T-02.5 — Leitura de xlsx sob demanda**
   - Depende de: T-02.2
   - Aceite:
     - SheetJS carregado por `import()` dinâmico, só para xlsx.

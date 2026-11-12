@@ -26,7 +26,8 @@ export const textos = {
       postoDuplicado: (d: { codigo: string; linha: number; primeiraLinha: number }) =>
         `Linha ${d.linha}: o posto ${d.codigo} já apareceu na linha ${d.primeiraLinha}. Vale só a primeira.`,
       postoSemNome: (linha: number) => `Linha ${linha}: falta o nome do posto.`,
-      xlsxSobDemanda: 'A leitura de planilhas .xlsx ainda não está disponível. Envie o relatório exportado pelo TASY.',
+      xlsxIlegivel:
+        'Não foi possível ler a planilha .xlsx. Confira se o arquivo abre no Excel ou envie o relatório exportado pelo TASY.',
     },
     avisos: {
       postoForaDoPadrao: (posto: string) =>

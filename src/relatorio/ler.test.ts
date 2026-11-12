@@ -48,9 +48,10 @@ describe('T-02.4 — amostra sintética', () => {
     'relatorio-9998-ponto-e-virgula.csv',
     'relatorio-9998-virgula.csv',
     'borda-linhas-em-branco-no-fim.xls',
+    'relatorio-9998.xlsx',
   ]) {
-    it(`${arquivo}: 12 postos, Total ignorado, 180 e 35 recalculados, sem avisos nem erros`, () => {
-      const resultado = lerFixture(arquivo);
+    it(`${arquivo}: 12 postos, Total ignorado, 180 e 35 recalculados, sem avisos nem erros`, async () => {
+      const resultado = await lerFixture(arquivo);
       expect(resultado.erros).toEqual([]);
       expect(resultado.avisos).toEqual([]);
       expect(resultado.postos).toHaveLength(12);
@@ -90,16 +91,16 @@ describe('T-02.4 — amostra sintética', () => {
 });
 
 describe('T-02.4 — casos de borda', () => {
-  it('arquivo vazio → erro "relatório sem postos"', () => {
-    expect(lerFixture('borda-vazio.xls')).toEqual({
+  it('arquivo vazio → erro "relatório sem postos"', async () => {
+    expect(await lerFixture('borda-vazio.xls')).toEqual({
       postos: [],
       avisos: [],
       erros: [{ tipo: 'sem-postos', mensagem: textos.leitura.erros.semPostos }],
     });
   });
 
-  it('só cabeçalho → erro "relatório sem postos"', () => {
-    const resultado = lerFixture('borda-so-cabecalho.xls');
+  it('só cabeçalho → erro "relatório sem postos"', async () => {
+    const resultado = await lerFixture('borda-so-cabecalho.xls');
     expect(resultado.postos).toEqual([]);
     expect(resultado.erros).toEqual([{ tipo: 'sem-postos', mensagem: textos.leitura.erros.semPostos }]);
   });
@@ -112,8 +113,8 @@ describe('T-02.4 — casos de borda', () => {
     expect(textos.leitura.erros.semPostos.toLowerCase()).toContain('relatório sem postos');
   });
 
-  it('coluna obrigatória ausente → erro que diz qual coluna falta, e nenhum posto', () => {
-    const resultado = lerFixture('borda-coluna-ausente.xls');
+  it('coluna obrigatória ausente → erro que diz qual coluna falta, e nenhum posto', async () => {
+    const resultado = await lerFixture('borda-coluna-ausente.xls');
     expect(resultado.postos).toEqual([]);
     expect(resultado.erros).toEqual([
       {
@@ -136,8 +137,8 @@ describe('T-02.4 — casos de borda', () => {
     ]);
   });
 
-  it('posto fora do padrão → aviso, e entra com o nome original como código', () => {
-    const resultado = lerFixture('borda-posto-fora-do-padrao.xls');
+  it('posto fora do padrão → aviso, e entra com o nome original como código', async () => {
+    const resultado = await lerFixture('borda-posto-fora-do-padrao.xls');
     expect(resultado.erros).toEqual([]);
     expect(resultado.postos).toEqual([
       {
@@ -165,8 +166,8 @@ describe('T-02.4 — casos de borda', () => {
     ]);
   });
 
-  it('número inválido (texto, negativo ou decimal) → erro na linha, e as outras linhas continuam', () => {
-    const resultado = lerFixture('borda-numero-invalido.xls');
+  it('número inválido (texto, negativo ou decimal) → erro na linha, e as outras linhas continuam', async () => {
+    const resultado = await lerFixture('borda-numero-invalido.xls');
     expect(resultado.postos.map((p) => p.codigo)).toEqual(['4.5']);
     expect(resultado.erros).toEqual([
       {
@@ -215,14 +216,14 @@ describe('T-02.4 — casos de borda', () => {
     expect(mensagem).toContain('-3');
   });
 
-  it('linhas em branco no fim são ignoradas', () => {
-    const resultado = lerFixture('borda-linhas-em-branco-no-fim.xls');
+  it('linhas em branco no fim são ignoradas', async () => {
+    const resultado = await lerFixture('borda-linhas-em-branco-no-fim.xls');
     expect(resultado.postos).toHaveLength(12);
     expect(resultado.erros).toEqual([]);
   });
 
-  it('código de posto repetido → erro, e vale só a primeira ocorrência', () => {
-    const resultado = lerFixture('borda-posto-duplicado.xls');
+  it('código de posto repetido → erro, e vale só a primeira ocorrência', async () => {
+    const resultado = await lerFixture('borda-posto-duplicado.xls');
     expect(resultado.postos.map((p) => [p.codigo, p.hospitalistas])).toEqual([
       ['4.2', 24],
       ['4.3', 19],
@@ -238,8 +239,8 @@ describe('T-02.4 — casos de borda', () => {
     ]);
   });
 
-  it('potenciais admissões maior que hospitalistas → aviso, sem bloquear a leitura', () => {
-    const resultado = lerFixture('borda-potenciais-maior.xls');
+  it('potenciais admissões maior que hospitalistas → aviso, sem bloquear a leitura', async () => {
+    const resultado = await lerFixture('borda-potenciais-maior.xls');
     expect(resultado.erros).toEqual([]);
     expect(resultado.postos.map((p) => [p.codigo, p.hospitalistas, p.potenciaisAdmissoes])).toEqual([
       ['4.2', 24, 2],
@@ -257,8 +258,8 @@ describe('T-02.4 — casos de borda', () => {
     ]);
   });
 
-  it('variações do ordinal geram os códigos certos, sem avisos', () => {
-    const resultado = lerFixture('borda-variacoes-ordinal.xls');
+  it('variações do ordinal geram os códigos certos, sem avisos', async () => {
+    const resultado = await lerFixture('borda-variacoes-ordinal.xls');
     expect(resultado.avisos).toEqual([]);
     expect(resultado.postos.map((p) => p.codigo)).toEqual(['2.1', '2.2', '4.3']);
   });
@@ -271,13 +272,17 @@ describe('T-02.4 — casos de borda', () => {
     ]);
   });
 
-  it('xlsx ainda não é lido por esta função e gera um erro claro', () => {
-    const resultado = lerFixture('relatorio-9998.xlsx');
-    expect(resultado.postos).toEqual([]);
-    expect(resultado.erros.map((e) => e.tipo)).toEqual(['xlsx-sob-demanda']);
+  it('xlsx corrompido (assinatura ZIP sem planilha válida) → erro claro, sem quebrar', async () => {
+    const bytes = new Uint8Array([0x50, 0x4b, 0x03, 0x04, 0xde, 0xad, 0xbe, 0xef, 0x00, 0x01]);
+    const resultado = await lerRelatorio(bytes.buffer, 'quebrado.xlsx');
+    expect(resultado).toEqual({
+      postos: [],
+      avisos: [],
+      erros: [{ tipo: 'xlsx-ilegivel', mensagem: textos.leitura.erros.xlsxIlegivel }],
+    });
   });
 
-  it('toda mensagem é texto não vazio vindo de textos/', () => {
+  it('toda mensagem é texto não vazio vindo de textos/', async () => {
     for (const arquivo of [
       'borda-vazio.xls',
       'borda-coluna-ausente.xls',
@@ -286,7 +291,7 @@ describe('T-02.4 — casos de borda', () => {
       'borda-posto-fora-do-padrao.xls',
       'borda-potenciais-maior.xls',
     ]) {
-      const resultado = lerFixture(arquivo);
+      const resultado = await lerFixture(arquivo);
       for (const item of [...resultado.avisos, ...resultado.erros]) expect(item.mensagem.length).toBeGreaterThan(0);
       expect(() => ResultadoLeituraSchema.parse(resultado)).not.toThrow();
     }

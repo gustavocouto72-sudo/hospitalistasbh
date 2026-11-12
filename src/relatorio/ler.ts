@@ -56,7 +56,7 @@ export const ErroSchema = z.discriminatedUnion('tipo', [
   }),
   z.strictObject({ tipo: z.literal('posto-duplicado'), linha, codigo: z.string(), primeiraLinha: linha, mensagem }),
   z.strictObject({ tipo: z.literal('posto-sem-nome'), linha, mensagem }),
-  z.strictObject({ tipo: z.literal('xlsx-sob-demanda'), mensagem }),
+  z.strictObject({ tipo: z.literal('xlsx-ilegivel'), mensagem }),
 ]);
 
 export type Erro = z.infer<typeof ErroSchema>;
@@ -173,25 +173,56 @@ export function lerLinhas(linhas: readonly (readonly string[])[]): ResultadoLeit
   return ResultadoLeituraSchema.parse({ postos, avisos, erros });
 }
 
+/** Converte uma célula do SheetJS no texto que `lerLinhas` espera; números saem com ponto decimal. */
+function textoDaCelula(valor: unknown): string {
+  if (valor === null || valor === undefined) return '';
+  if (valor instanceof Date) return valor.toISOString();
+  return String(valor).trim();
+}
+
 /**
- * Lê o relatório inteiro a partir dos bytes. O formato vem do conteúdo. O xlsx precisa da leitura sob
- * demanda (T-02.5) e, por enquanto, volta com um erro.
+ * Lê a primeira planilha do xlsx. O SheetJS só é baixado aqui, por `import()` dinâmico, para não pesar
+ * no bundle inicial de quem envia o texto tabulado do TASY (o caso real).
  */
-export function lerRelatorio(arquivo: ArrayBuffer, nome: string): ResultadoLeitura {
-  const decodificado = decodificarRelatorio(arquivo, nome);
-  if (decodificado.formato === 'vazio') {
-    return ResultadoLeituraSchema.parse({
-      postos: [],
-      avisos: [],
-      erros: [{ tipo: 'sem-postos', mensagem: textos.leitura.erros.semPostos }],
-    });
+async function linhasDoXlsx(bytes: Uint8Array): Promise<string[][] | undefined> {
+  const { read, utils } = await import('xlsx');
+  try {
+    const planilhas = read(bytes, { type: 'array', cellFormula: false, cellHTML: false, cellStyles: false });
+    const primeira = planilhas.SheetNames[0];
+    const planilha = primeira === undefined ? undefined : planilhas.Sheets[primeira];
+    if (planilha === undefined) return [];
+    const linhas = utils.sheet_to_json<unknown[]>(planilha, { header: 1, raw: true, defval: '', blankrows: false });
+    return linhas.map((linha) => linha.map(textoDaCelula)).filter((linha) => linha.some((c) => c !== ''));
+  } catch {
+    return undefined;
   }
+}
+
+const semPostos = (): ResultadoLeitura =>
+  ResultadoLeituraSchema.parse({
+    postos: [],
+    avisos: [],
+    erros: [{ tipo: 'sem-postos', mensagem: textos.leitura.erros.semPostos }],
+  });
+
+/**
+ * Lê o relatório inteiro a partir dos bytes. O formato vem do conteúdo. É assíncrona porque o xlsx
+ * carrega o SheetJS sob demanda; texto tabulado e CSV não carregam nada.
+ */
+export async function lerRelatorio(arquivo: ArrayBuffer, nome: string): Promise<ResultadoLeitura> {
+  const decodificado = decodificarRelatorio(arquivo, nome);
+  if (decodificado.formato === 'vazio') return semPostos();
   if (decodificado.formato === 'xlsx') {
-    return ResultadoLeituraSchema.parse({
-      postos: [],
-      avisos: [],
-      erros: [{ tipo: 'xlsx-sob-demanda', mensagem: textos.leitura.erros.xlsxSobDemanda }],
-    });
+    const linhas = await linhasDoXlsx(decodificado.bytes);
+    if (linhas === undefined) {
+      return ResultadoLeituraSchema.parse({
+        postos: [],
+        avisos: [],
+        erros: [{ tipo: 'xlsx-ilegivel', mensagem: textos.leitura.erros.xlsxIlegivel }],
+      });
+    }
+    if (linhas.length === 0) return semPostos();
+    return lerLinhas(linhas);
   }
   return lerLinhas(decodificado.linhas);
 }
