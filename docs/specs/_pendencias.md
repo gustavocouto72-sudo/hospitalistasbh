@@ -129,3 +129,16 @@ basta tirar esse ramo e trocar a fixture por Latin-1.
 
 - SheetJS 0.20.3 instalado pelo tarball do CDN da SheetJS, fora do registro npm (hash fixado no lockfile, escolha registrada em _pendencias.md) (package.json)
 - textoDaCelula transforma Date em texto ISO; irrelevante para as colunas do 9998, mas célula de data formatada viraria texto inesperado (src/relatorio/ler.ts)
+
+## T-03.1
+
+- **3.1 na semana (`escalaPropria`):** a spec traz "—" em médicos; o quadro grava `medicos: 0`, já que
+  esses setores ficam fora das somas da média. Se o dono quiser mostrar a escala própria do 3.1, vira um
+  campo à parte.
+- **Ids dos setores:** `2` para o 2º andar e `3.1+6.1` para o setor fundido do fim de semana; os demais
+  usam o código do posto principal.
+
+## T-03.1 (rodada 1)
+
+- 3.1 da semana (escalaPropria) grava medicos: 0 onde a spec traz '—'; decisão registrada em _pendencias.md (src/config/quadros.ts)
+- Spec cita config/quadros.ts; arquivo criado em src/config/quadros.ts (src/config/quadros.ts)

@@ -1,6 +1,6 @@
 # Tasks — SPEC-03 Quadro, carga e semáforo
 
-- [ ] **T-03.1 — Tipos e quadros padrão**
+- [x] **T-03.1 — Tipos e quadros padrão**
   - Depende de: T-01.3
   - Aceite:
     - Tipos `Setor`, `Quadro` e `TipoDia`.
