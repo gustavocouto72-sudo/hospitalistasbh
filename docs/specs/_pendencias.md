@@ -212,3 +212,24 @@ O resultado (`PainelComApoios`) guarda os números de antes em `antes`, mais `le
 
 - A spec descreve aplicarApoios → Painel; a função devolve PainelComApoios, compatível com Painel, o que está documentado e testado (src/calculo/aplicar-apoios.ts)
 - O teste 'o resultado serve onde se espera um Painel' está fora do describe principal (src/calculo/aplicar-apoios.test.ts)
+
+## T-04.2 — Critérios da busca exaustiva
+
+- **"Fora do verde"** conta os azuis também, além de amarelos, vermelhos e `semMedico` com leitos, como diz a
+  letra da spec e do PRD ("deixar todos os setores no verde"). Assim, um setor azul que apoia sai da conta, e a
+  busca pode preferir uma solução que leva um azul ao verde. O passo guloso da spec só olha os setores acima
+  do verde, então, se o dono quiser contar só os de cima, basta trocar `foraDoVerde` em
+  `test/busca-exaustiva.ts` (e a T-04.3 deve seguir a mesma regra).
+- **Efeito colateral da ordem dos critérios:** quando nem tudo cabe no verde, o critério 3 (menos leitos) vem
+  antes do 4 (menor carga máxima). Num setor vermelho que não tem como ficar verde, a busca cede o mínimo de
+  leitos que leva os apoiadores ao verde, e não o máximo que aliviaria o vermelho.
+- **Critério 4** olha só os setores com médico; um `semMedico` que sobra (carga por médico infinita) não
+  empata tudo.
+- **Critério 5** compara os apoios ordenados por (apoiado, apoiador) como sequência de (posição do apoiado no
+  quadro, posição do apoiador, leitos).
+- Um par (apoiador, apoiado) aparece no máximo uma vez, e a média indefinida não gera apoio.
+
+## T-04.2 (rodada 1)
+
+- Azuis contam como 'fora do verde' no critério 1; decisão pendente do dono (registrada em _pendencias.md), e a T-04.3 deve seguir a mesma regra (test/busca-exaustiva.ts)
+- Sem solução completa, o critério 3 (menos leitos) antes do 4 faz o setor vermelho ceder o mínimo de leitos, e não o máximo que o aliviaria; segue a spec e está documentado (docs/specs/_pendencias.md)

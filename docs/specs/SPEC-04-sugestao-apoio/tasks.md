@@ -7,7 +7,7 @@
     - `aplicarApoios` recalcula a carga ponderada (1,25 no apoiador) e as cores contra a média original.
     - Invariantes testados.
 
-- [ ] **T-04.2 — Busca exaustiva de referência (só para testes)**
+- [x] **T-04.2 — Busca exaustiva de referência (só para testes)**
   - Depende de: T-04.1
   - Aceite:
     - Busca até 3 apoios em painéis pequenos, seguindo os critérios lexicográficos da spec.
