@@ -1,6 +1,6 @@
 # Tasks — SPEC-07 Publicação e privacidade
 
-- [ ] **T-07.1 — Cabeçalhos e CSP**
+- [x] **T-07.1 — Cabeçalhos e CSP**
   - Depende de: T-01.1
   - Aceite:
     - `vercel.json` com os cabeçalhos da spec.

@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { z } from 'zod';
 import { textos } from '../textos';
 import { ContagemPostoSchema, ResultadoLeituraSchema, lerLinhas, lerRelatorio } from './ler';
 
@@ -295,5 +296,11 @@ describe('T-02.4 — casos de borda', () => {
       for (const item of [...resultado.avisos, ...resultado.erros]) expect(item.mensagem.length).toBeGreaterThan(0);
       expect(() => ResultadoLeituraSchema.parse(resultado)).not.toThrow();
     }
+  });
+});
+
+describe('Zod sob a CSP (T-07.1)', () => {
+  it('roda sem JIT, para não sondar Function() e violar a CSP sem unsafe-eval', () => {
+    expect(z.config().jitless).toBe(true);
   });
 });

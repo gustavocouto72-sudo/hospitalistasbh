@@ -355,3 +355,18 @@ seguinte à decisão do apoio, e só aparece quando há quadro calculado (sem da
 
 - Textos-chave conferidos na tela, não no texto extraído do PDF (e2e/impressao.spec.ts)
 - Sem dados carregados, a impressão mostra a tela interativa com controles (pendência herdada da T-06.1) (src/componentes/Pagina.tsx)
+
+## T-07.1 — CSP com 'unsafe-inline'
+
+O export estático do Next 16 põe scripts inline no HTML (`self.__next_f.push`, o payload do React Server
+Components) e não há servidor para gerar nonce. Por isso a CSP usa `script-src 'self' 'unsafe-inline'` e
+`style-src 'self' 'unsafe-inline'`. A garantia de privacidade da spec continua de pé: `connect-src 'self'`,
+`form-action 'none'` e nenhum domínio de terceiros, então nem um script injetado consegue enviar o relatório
+para fora. `'unsafe-eval'` não entra (o Zod roda com `jitless`). Se o dono quiser, dá para trocar o
+`'unsafe-inline'` de script por hashes gerados no build, ao custo de um passo a mais no deploy. Não é preciso
+para a nota A do securityheaders.com.
+
+## T-07.1 (rodada 1)
+
+- CSP usa 'unsafe-inline' em script-src e style-src (decisão registrada em _pendencias.md; pode virar hashes no build) (vercel.json)
+- Servidor estático e teste só consideram a regra com source '/(.*)'; outras regras do vercel.json seriam ignoradas (scripts/servir-estatico.mjs)

@@ -13,6 +13,9 @@ import { decodificarRelatorio } from './decodificar';
 import { lerContagem } from './numeros';
 import { extrairCodigoPosto } from './posto';
 
+// A CSP do site (vercel.json) não tem 'unsafe-eval'. Sem JIT, o Zod nem tenta Function() para sondar.
+z.config({ jitless: true });
+
 const contagem = z.number().int().nonnegative();
 
 export const ContagemPostoSchema = z.strictObject({
