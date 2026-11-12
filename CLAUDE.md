@@ -1,6 +1,6 @@
 # Divisão de carga dos hospitalistas
 
-Calculadora web aberta e sem login, publicada na Vercel. Lê o relatório 9998 do TASY, mostra a carga por médico em cada setor num semáforo de cinco cores e sugere leitos de apoio entre setores. Nada é guardado. Fase atual: specs prontas, sem código.
+Calculadora web aberta e sem login, publicada na Vercel. Lê o relatório 9998 do TASY, mostra a carga por médico em cada setor num semáforo de cinco cores e sugere leitos de apoio entre setores. Nada é guardado. Fase atual: fundação (SPEC-01) em construção.
 
 ## Leia antes de mudar algo
 
@@ -15,5 +15,5 @@ Calculadora web aberta e sem login, publicada na Vercel. Lê o relatório 9998 d
 - **Nenhum dado real** em código, teste, fixture ou commit. Fixtures são sintéticas, e nunca entram nomes de médicos ou pacientes, porque o repositório será público.
 - **Nada sai do navegador.** Não use analytics, scripts de terceiros nem `fetch` com dados do relatório.
 - **Idioma:** identificadores do domínio em pt-BR (`setor`, `posto`, `carga`, `apoio`, `semaforo`), termos técnicos em inglês e interface em português, com os textos em `src/textos/`.
-- **Interface:** toda tela ou componente usa a skill `impeccable` (`.claude/skills/impeccable`), carregada antes do trabalho.
+- **Interface:** toda tela ou componente usa a skill `impeccable` (`.claude/skills/impeccable`), carregada antes do trabalho. A skill vem do OncoWay sob Apache 2.0; a licença e os avisos ficam em `.claude/skills/LICENSE-impeccable` e `.claude/skills/NOTICE-impeccable.md` e acompanham qualquer cópia.
 - **Porta local:** 3010, fixa e registrada em `~/Antigravity/PORTS.md`. Nunca mate processo de outro projeto.

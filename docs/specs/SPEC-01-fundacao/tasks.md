@@ -21,7 +21,7 @@
     - Pastas `calculo/`, `relatorio/`, `componentes/`, `textos/`, `config/` e `test/fixtures/` criadas.
     - Regra de lint que impede `calculo/` e `relatorio/` de importar React.
 
-- [ ] **T-01.4 — Skill impeccable e CLAUDE.md**
+- [x] **T-01.4 — Skill impeccable e CLAUDE.md**
   - Depende de: T-01.1
   - Aceite:
     - `.claude/skills/impeccable` copiada do OncoWay, junto com LICENSE e NOTICE.

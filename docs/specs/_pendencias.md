@@ -37,3 +37,9 @@ reescrever as specs. Ajustar se o dono preferir outro estilo.
 - Teste de qualidade compara as strings exatas dos scripts; qualquer ajuste neles vai quebrar o teste (test/qualidade.test.ts)
 - Prettier 'no padrão do OncoWay' não tinha referência a seguir; o estilo escolhido foi registrado em _pendencias.md para o dono validar (docs/specs/_pendencias.md)
 - Markdown e docs/ fora do Prettier (intencional) (.prettierignore)
+
+## T-01.4 (rodada 1)
+
+- NOTICE cita os caminhos skill/reference/ios.md e android.md, mas na cópia eles ficam em impeccable/reference/ (.claude/skills/NOTICE-impeccable.md)
+- Não foi possível comparar a cópia com a fonte do OncoWay, que não foi localizada nesta máquina (.claude/skills/impeccable)
+- Status da task ainda em [~]; quem muda o status é o enxuto.mjs (docs/specs/SPEC-01-fundacao/tasks.md)
