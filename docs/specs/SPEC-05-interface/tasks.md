@@ -1,6 +1,6 @@
 # Tasks — SPEC-05 Interface
 
-- [ ] **T-05.1 — Direção visual com a impeccable**
+- [x] **T-05.1 — Direção visual com a impeccable**
   - Depende de: T-01.4
   - Aceite:
     - Tokens de cor (incluindo as cinco do semáforo, validadas para contraste e daltonismo), tipografia e espaçamento.

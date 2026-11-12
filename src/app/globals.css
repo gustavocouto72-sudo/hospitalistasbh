@@ -1,1 +1,84 @@
 @import 'tailwindcss';
+
+/*
+ * Tema (T-05.1). Direção em DESIGN.md; os valores espelham src/tema/tokens.ts, e tema.test.ts confere os dois.
+ * Tailwind gera as utilidades a partir daqui: bg-papel, text-tinta, bg-semaforo-verde-fundo, text-carga etc.
+ */
+@theme {
+  --color-pagina: #eef0f2;
+  --color-papel: #ffffff;
+  --color-tinta: #14181f;
+  --color-tinta-suave: #4a5361;
+  --color-linha: #d5d9df;
+  --color-linha-forte: #8a93a0;
+  --color-acao: #14181f;
+  --color-acao-texto: #ffffff;
+  --color-foco: #14181f;
+  --color-admissao: #6b2fa3;
+  --color-admissao-fundo: #f1e8fa;
+
+  --color-semaforo-azul-escuro-fundo: #1d3f8f;
+  --color-semaforo-azul-escuro-texto: #ffffff;
+  --color-semaforo-azul-escuro-traco: #1d3f8f;
+  --color-semaforo-azul-claro-fundo: #9ccbf2;
+  --color-semaforo-azul-claro-texto: #0b1d33;
+  --color-semaforo-azul-claro-traco: #1f5f99;
+  --color-semaforo-verde-fundo: #3daa6e;
+  --color-semaforo-verde-texto: #0e2a12;
+  --color-semaforo-verde-traco: #1e6b3f;
+  --color-semaforo-amarelo-fundo: #ffd84a;
+  --color-semaforo-amarelo-texto: #2b2100;
+  --color-semaforo-amarelo-traco: #7a5a00;
+  --color-semaforo-vermelho-fundo: #a51c1c;
+  --color-semaforo-vermelho-texto: #ffffff;
+  --color-semaforo-vermelho-traco: #a51c1c;
+
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  --text-nota: 0.75rem;
+  --text-nota--line-height: 1rem;
+  --text-rotulo: 0.875rem;
+  --text-rotulo--line-height: 1.25rem;
+  --text-corpo: 1rem;
+  --text-corpo--line-height: 1.5rem;
+  --text-titulo: 1.25rem;
+  --text-titulo--line-height: 1.75rem;
+  --text-numero: 1.5rem;
+  --text-numero--line-height: 2rem;
+  --text-carga: 2.25rem;
+  --text-carga--line-height: 2.5rem;
+
+  /* Espaço: a base de 4 px do Tailwind (--spacing: 0.25rem) fica como está. */
+
+  --radius-controle: 0.375rem;
+  --radius-cartao: 0.5rem;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-pagina);
+    color: var(--color-tinta);
+    font-family: var(--font-sans);
+    font-variant-numeric: tabular-nums;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  ::selection {
+    background-color: var(--color-tinta);
+    color: var(--color-papel);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-foco);
+    outline-offset: 2px;
+  }
+
+  @media print {
+    html {
+      background-color: var(--color-papel);
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+  }
+}

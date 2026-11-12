@@ -252,3 +252,17 @@ exaustiva da T-04.2. Se o dono preferir aliviar primeiro quem está acima do ver
 ## T-04.4 (rodada 1)
 
 - Uma das 8 divergências (semente 5254) perde no critério foraDoVerde com o guloso limitado a 3 apoios; sem o limite ele não fica atrás. Está registrada e dentro da tolerância de 5%. (test/aceitacao-apoio.test.ts)
+
+## T-05.1 — Direção visual sem o dono
+
+A skill `impeccable` pede entrevista para o `PRODUCT.md` e uma página de decisão para a direção visual, mas o
+loop não tem canal de pergunta. O `PRODUCT.md` foi inferido do PRD e da SPEC-05, com as inferências marcadas,
+e a direção é a sorteada pela skill (tabela plastificada do posto, seed `seed:0adbe83570ad4207`). O dono revisa
+o `DESIGN.md` ao fim do loop. Também ficou de fora o modo escuro: só há tema claro, o mesmo da impressão.
+
+## T-05.1 (rodada 1)
+
+- Só há tema claro; o modo escuro ficou registrado como pendência (DESIGN.md)
+- Direção visual escolhida sem a etapa de decisão da skill e sem o dono; PRODUCT.md inferido do PRD (PRODUCT.md)
+- As razões de contraste citadas no DESIGN.md (por exemplo, 15,6:1) não são conferidas pelo teste, que só garante o mínimo AA (DESIGN.md)
+- A régua de cinco casas está só descrita, ainda sem componente nem token próprio (DESIGN.md)
