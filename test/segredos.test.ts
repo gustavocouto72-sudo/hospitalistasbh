@@ -22,7 +22,7 @@ describe('T-01.5 — porta e segredos', () => {
     expect(statSync(gancho).mode & 0o111).not.toBe(0);
     expect(readFileSync(gancho, 'utf8')).toContain('gitleaks git --pre-commit --staged');
     expect(readFileSync(new URL('.gitleaks.toml', raiz), 'utf8')).toMatch(/useDefault = true/);
-    expect(pacote.scripts.prepare).toBe('git config core.hooksPath .githooks');
+    expect(pacote.scripts.prepare).toBe('git config core.hooksPath .githooks || true');
   });
 
   it('o .gitignore barra build, dependências e relatórios fora de test/fixtures/', () => {

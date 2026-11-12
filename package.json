@@ -15,7 +15,7 @@
     "lint": "eslint . && prettier --check .",
     "test": "vitest run",
     "format": "prettier --write .",
-    "prepare": "git config core.hooksPath .githooks",
+    "prepare": "git config core.hooksPath .githooks || true",
     "e2e": "playwright test"
   },
   "dependencies": {

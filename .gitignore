@@ -17,3 +17,6 @@ playwright-report/
 
 # Gerado pelo Next.js
 next-env.d.ts
+
+# Estado local do Compozy (caminho da máquina)
+.compozy/workspace.toml
