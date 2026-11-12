@@ -1,0 +1,8 @@
+# Overlay de workspace do CompozyOS para a Divisão de carga dos hospitalistas.
+# Agentes em Opus 5.5 com raciocínio médio, como no OncoWay. O padrão global (~/.compozy/config.toml) é "high".
+[providers.claude.models]
+default = "default"
+[[providers.claude.models.curated]]
+id = "default"
+default_reasoning_effort = "medium"
+default_speed = "normal"

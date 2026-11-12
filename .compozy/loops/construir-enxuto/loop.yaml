@@ -1,0 +1,236 @@
+apiVersion: compozy.loop/v1
+kind: Loop
+meta:
+    name: construir-enxuto
+    version: 1
+    description: Modo enxuto, adaptado do OncoWay. Uma task por geração, na ordem das specs de docs/specs, até não sobrar task elegível. O scripts/loop/enxuto.mjs escolhe a task e a marca [~]. Um agente de contexto limpo a implementa com testes primeiro. Outro agente de contexto limpo, só de leitura, roda typecheck, lint e testes e julga o diff contra os critérios. Aprovada, a task vai a [x] e entra na main por commit local (ainda não há repositório remoto). Reprovada, volta à implementação com os achados, até 3 rodadas; na terceira vai a [!], com o parcial em refs/enxuto/, e o loop segue para a próxima. Comando, no terminal do dono, `caffeinate -i compozy loop run --name construir-enxuto --workspace hospitalistas-divisao`; rodar de novo retoma de onde parou.
+    catalog:
+        use_when: Há tasks a fazer em docs/specs e o dono quer o desenvolvimento rodando sozinho até o fim.
+        keywords:
+            - tasks
+            - specs
+            - reviews
+            - agents
+        category: Engineering
+concurrency: forbid
+contract:
+    goal: Implementar, revisar com contexto limpo e commitar na main, uma por vez, todas as tasks elegíveis de docs/specs.
+    definition_of_done: |
+        Nenhuma task elegível sobrou. Cada task executada foi implementada por um agente, revisada por outro agente de
+        contexto limpo e terminou em [x], commitada na main, ou em [!], depois de 3 revisões sem aprovação, com o parcial
+        em refs/enxuto/<T>. O status muda só pelo scripts/loop/enxuto.mjs.
+    iteration_cap: 120
+    no_progress:
+        window: 6
+    budget:
+        tokens: 0
+        wall_clock_sec: 0
+        on_exceeded: escalate
+    terminal_states:
+        - done
+        - no-op
+        - blocked
+        - failed
+        - exhausted
+        - stalled
+graph:
+    nodes:
+        # A task em andamento ou a primeira a fazer com as dependências feitas. Sem task elegível, vai ao fim.
+        - id: proxima
+          class: control
+          kind: gate
+          criteria:
+            - id: ha_tarefa
+              type: command
+              check: node scripts/loop/enxuto.mjs proxima
+          on_result:
+            fail:
+                route: fim
+            timeout: halt
+        - id: implementar
+          class: action
+          kind: run-agent
+          session:
+            isolated: true
+          timeout: 120m
+          retry:
+            max_attempts: 1
+          params:
+            agent: general
+            runtime:
+                provider: claude
+                model: opus
+                reasoning: medium
+            output_schema:
+                additionalProperties: false
+                properties:
+                    terminou:
+                        type: boolean
+                    resumo:
+                        type: string
+                required:
+                    - terminou
+                    - resumo
+                type: object
+            prompt: |
+                Você implementa uma task do projeto "Divisão de carga dos hospitalistas". Responda em português.
+
+                1. Na raiz do workspace, sem `cd`, rode `node scripts/loop/enxuto.mjs tarefa`. Ele mostra a task da vez, os
+                   critérios de aceite e os achados da revisão anterior, se houver.
+                2. Leia o CLAUDE.md da raiz, a spec indicada inteira e as partes do docs/prd.md que ela cita. Se a task mexe
+                   em interface, leia e siga a skill em .claude/skills/impeccable/SKILL.md e o DESIGN.md antes de escrever
+                   qualquer componente.
+                3. Implemente a task inteira, com todos os critérios de aceite e corrigindo os achados anteriores. Testes
+                   primeiro, com Vitest. Escreva o teste que falha, depois o código.
+                4. Rode `pnpm -s typecheck`, `pnpm -s lint` e `pnpm -s test`, e corrija até ficarem verdes. Se a task tiver
+                   e2e, rode também `pnpm -s e2e`.
+
+                Regras:
+                - Não faça commit nem push e não mude o status das tasks no tasks.md, porque isso é do loop.
+                - Não grave na memória do Claude.
+                - Use dado sempre sintético: nunca nomes de pacientes ou de médicos, e nenhum segredo literal.
+                - Identificadores do domínio em pt-BR, termos técnicos em inglês e textos da interface em src/textos/.
+                - O servidor local usa só a porta 3010. Antes de subir, rode `lsof -nP -iTCP:3010 -sTCP:LISTEN`. Nunca mate
+                  processo de outro projeto e termine todo processo que abrir antes de responder.
+                - Se algo exigir decisão do dono, escolha a opção mais simples coerente com o PRD e registre a dúvida em
+                  docs/specs/_pendencias.md.
+
+                Devolva `terminou: true` e um resumo curto do que fez. Se não conseguiu, devolva `terminou: false` e o
+                motivo.
+        # Revisão de contexto limpo: sessão nova, só de leitura, sem nada da implementação além do diff.
+        - id: revisar
+          class: action
+          kind: run-agent
+          session:
+            isolated: true
+          timeout: 60m
+          retry:
+            max_attempts: 1
+          params:
+            agent: general
+            runtime:
+                provider: claude
+                model: opus
+                reasoning: medium
+            output_schema:
+                additionalProperties: false
+                properties:
+                    aprovado:
+                        type: boolean
+                    bloqueantes:
+                        items:
+                            additionalProperties: false
+                            properties:
+                                titulo:
+                                    minLength: 1
+                                    type: string
+                                detalhe:
+                                    type: string
+                                arquivo:
+                                    type: string
+                            required:
+                                - titulo
+                            type: object
+                        type: array
+                    baixos:
+                        items:
+                            additionalProperties: false
+                            properties:
+                                titulo:
+                                    minLength: 1
+                                    type: string
+                                arquivo:
+                                    type: string
+                            required:
+                                - titulo
+                            type: object
+                        type: array
+                    verificacoes:
+                        items:
+                            additionalProperties: false
+                            properties:
+                                comando:
+                                    type: string
+                                ok:
+                                    type: boolean
+                                saida:
+                                    type: string
+                            required:
+                                - comando
+                                - ok
+                            type: object
+                        type: array
+                required:
+                    - aprovado
+                    - bloqueantes
+                    - baixos
+                    - verificacoes
+                type: object
+            prompt: |
+                Você revisa uma task do projeto "Divisão de carga dos hospitalistas" com contexto limpo. Não mude, crie nem
+                apague arquivo, e não faça commit. Responda em português.
+
+                1. Na raiz do workspace, sem `cd`, rode `node scripts/loop/enxuto.mjs tarefa` para ler a task, os critérios
+                   de aceite e os achados da rodada anterior, se houver. Leia a spec indicada e o CLAUDE.md.
+                2. Veja o que mudou: `git status --short`, `git diff HEAD` (se ainda não houver commit, só `git status`) e os
+                   arquivos novos, que não estão rastreados.
+                3. Se existir package.json, rode `pnpm -s typecheck`, `pnpm -s lint` e `pnpm -s test`. Se a task tiver e2e,
+                   rode `pnpm -s e2e`. Um teste que falhe só por tempo-limite roda de novo isolado antes de contar como
+                   falha. Termine todo processo que abrir.
+                4. Julgue o diff contra os critérios de aceite e as regras do CLAUDE.md.
+
+                Régua: é bloqueante só o que é defeito de verdade:
+                - critério de aceite não cumprido;
+                - teste falhando;
+                - cálculo errado (carga, média, cor do semáforo ou apoio);
+                - dado real ou nome de pessoa no repositório;
+                - segredo literal;
+                - envio do relatório para fora do navegador.
+
+                Estilo, nome, documentação e melhorias possíveis são baixos. Aprove (`aprovado: true`, sem bloqueantes)
+                quando a task cumpre os critérios e as verificações passam. Em `verificacoes`, devolva cada comando que
+                rodou, com `ok` e, se falhou, o fim da saída.
+        # Aprovada: [x] e commit. Reprovada: guarda os achados para a rodada seguinte ou, na terceira, marca [!].
+        - id: registrar
+          class: control
+          kind: gate
+          criteria:
+            - id: registrada
+              type: command
+              check: node scripts/loop/enxuto.mjs registrar --revisao {{ json .nodes.revisar.output | shellQuote }}
+          on_result:
+            fail: halt
+            timeout: halt
+        # Ainda há o que fazer: geração nova, que retoma a task reprovada ou pega a próxima.
+        - id: continuar
+          class: control
+          kind: gate
+          criteria:
+            - id: terminou
+              type: command
+              check: node scripts/loop/enxuto.mjs terminado
+          on_result:
+            fail: next_generation
+            timeout: halt
+        - id: fim
+          class: control
+          kind: collect
+    edges:
+        - from: proxima
+          to: implementar
+        - from: proxima
+          to: fim
+        - from: implementar
+          to: revisar
+        - from: revisar
+          to: registrar
+        - from: registrar
+          to: continuar
+        - from: continuar
+          to: fim
+start:
+    - kind: manual
+    - kind: cli
+    - kind: http
+    - kind: uds
+    - kind: native_tool
