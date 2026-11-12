@@ -171,6 +171,10 @@ export const textos = {
         'Nenhum setor tem médicos, então não há média do dia. Informe os médicos de cada setor para calcular a carga.',
     },
   },
+  imprimir: {
+    botao: 'Imprimir ou gerar PDF',
+    nota: 'Sai a folha do dia, só com os apoios aceitos. Para o PDF, escolha “Salvar como PDF” no navegador.',
+  },
   folha: {
     titulo: 'Divisão dos hospitalistas',
     /** "Gerada em 12/11/2026 às 09:05". */

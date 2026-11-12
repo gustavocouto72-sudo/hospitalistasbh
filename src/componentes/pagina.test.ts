@@ -114,6 +114,23 @@ describe('Página — Testing Library', () => {
     expect(within(folha()).getAllByRole('listitem')).toHaveLength(1);
   });
 
+  it('o botão de imprimir chama window.print() e só aparece com o quadro do dia', async () => {
+    const imprimir = vi.spyOn(window, 'print').mockImplementation(() => undefined);
+    try {
+      const vazio = render(createElement(Pagina));
+      expect(screen.queryByRole('button', { name: textos.imprimir.botao })).toBeNull();
+      vazio.unmount();
+
+      const { usuario } = await subirFixture();
+      const botao = screen.getByRole('button', { name: textos.imprimir.botao });
+      expect(botao.closest('main')?.className).toMatch(/\bprint:hidden\b/);
+      await usuario.click(botao);
+      expect(imprimir).toHaveBeenCalledTimes(1);
+    } finally {
+      imprimir.mockRestore();
+    }
+  });
+
   it('o fim de semana troca o quadro e zera os apoios', async () => {
     const { usuario, container } = await subirFixture();
     await usuario.click(screen.getByRole('radio', { name: textos.topo.tipoDia.fimDeSemana }));

@@ -35,6 +35,7 @@ import {
   sugestaoDoDia,
   trocarApoiador,
 } from './apoios-dia';
+import { BotaoImprimir } from './BotaoImprimir';
 import { FolhaImpressao } from './FolhaImpressao';
 import { ListaApoios } from './ListaApoios';
 import { painelDoDia } from './painel-dia';
@@ -144,6 +145,7 @@ export function Pagina() {
               aoAdicionar={(apoio) => setApoios((atual) => adicionarApoio(atual, apoio))}
               aoEscolherVista={(vista) => setApoios((atual) => escolherVista(atual, vista))}
             />
+            {imprimivel ? <BotaoImprimir /> : null}
             <QuadroSetores
               painel={vistaPainel}
               postos={postos}

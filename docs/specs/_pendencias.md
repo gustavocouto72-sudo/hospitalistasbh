@@ -335,3 +335,23 @@ o `DESIGN.md` ao fim do loop. Também ficou de fora o modo escuro: só há tema 
 
 - Sem dados carregados, imprimir mostra a tela interativa com controles (o main só recebe print:hidden quando há folha) (src/componentes/Pagina.tsx)
 - Critério de Safari e PDF no celular depende de conferência manual, prevista na T-06.2 (docs/specs/SPEC-06-impressao-pdf/spec.md)
+
+## T-06.2 — Conferência manual no celular (dono)
+
+O botão "Imprimir ou gerar PDF" chama `window.print()`, e o Playwright confere o PDF em A4 do Chromium (1 página,
+com os textos-chave). Falta a conferência à mão, que o loop não consegue fazer e que não o bloqueia:
+
+- **Android (Chrome):** subir a amostra, aceitar os apoios, tocar no botão, escolher "Salvar como PDF" e ver se
+  a tabela sai inteira, numa página, com as cores e os rótulos.
+- **iOS (Safari):** o mesmo, pelo menu de compartilhar ou de imprimir ("Salvar em Arquivos" ou gesto de
+  pinça na pré-visualização).
+- **Safari no desktop:** a folha da amostra cabe em 1 página A4 (critério da SPEC-06).
+- **Preto e branco:** imprimir em escala de cinza e conferir que o rótulo e a régua bastam.
+
+**Posição do botão:** ficou logo abaixo da lista de apoios, antes dos cartões, porque imprimir é o passo
+seguinte à decisão do apoio, e só aparece quando há quadro calculado (sem dados, não há folha para imprimir).
+
+## T-06.2 (rodada 1)
+
+- Textos-chave conferidos na tela, não no texto extraído do PDF (e2e/impressao.spec.ts)
+- Sem dados carregados, a impressão mostra a tela interativa com controles (pendência herdada da T-06.1) (src/componentes/Pagina.tsx)

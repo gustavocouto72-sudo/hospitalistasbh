@@ -7,7 +7,7 @@
     - Controles escondidos.
     - Cabe em 1 página A4 com a amostra.
 
-- [ ] **T-06.2 — Botão e testes**
+- [x] **T-06.2 — Botão e testes**
   - Depende de: T-06.1
   - Aceite:
     - Botão chama `window.print()`.

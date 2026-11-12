@@ -49,10 +49,40 @@ test('na impressão, só a folha aparece, sem controles', async ({ page }) => {
   await expect(folha.getByText(t.gerado('127.0.0.1:3010'))).toBeVisible();
 });
 
-test('com a amostra, o PDF em A4 tem 1 página', async ({ page }, info) => {
+test('o botão "Imprimir ou gerar PDF" chama window.print()', async ({ page }) => {
+  await page.addInitScript(() => {
+    const contagem = { vezes: 0 };
+    Object.assign(window, { __impressoes: contagem });
+    window.print = () => {
+      contagem.vezes++;
+    };
+  });
+  await subirEAceitarTudo(page);
+  await page.getByRole('button', { name: textos.imprimir.botao }).click();
+  expect(await page.evaluate(() => (window as unknown as { __impressoes: { vezes: number } }).__impressoes.vezes)).toBe(
+    1,
+  );
+});
+
+test('com a amostra, o PDF em A4 tem 1 página e os textos-chave', async ({ page }, info) => {
   await subirEAceitarTudo(page);
   await page.emulateMedia({ media: 'print' });
+  const folha = page.locator('section[data-folha]');
   const pdf = await page.pdf({ format: 'A4', preferCSSPageSize: true, printBackground: true });
   writeFileSync(info.outputPath('folha.pdf'), pdf);
   expect(paginas(pdf)).toBe(1);
+  // O texto do PDF do Chromium vem comprimido; os textos-chave são conferidos no mesmo DOM que gerou o PDF.
+  const texto = await folha.innerText();
+  for (const chave of [
+    t.titulo,
+    textos.topo.tipoDia.semana,
+    t.colunas.antes,
+    t.colunas.depois,
+    t.apoios,
+    t.media,
+    t.gerado('127.0.0.1:3010'),
+  ])
+    expect(texto).toContain(chave);
+  expect(texto).toMatch(/ apoia \d+ leitos? do /);
+  expect(texto).not.toContain(textos.imprimir.botao);
 });
