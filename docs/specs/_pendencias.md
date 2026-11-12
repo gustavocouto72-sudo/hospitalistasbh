@@ -63,3 +63,17 @@ números exatos de cada posto, basta trocar a tabela `LINHAS` em `test/fixtures/
 ## T-02.1 (rodada 1)
 
 - Números por posto e total de potenciais admissões (15) são inventados porque a amostra real não está disponível; está registrado em _pendencias.md e os totais conhecidos foram mantidos (test/fixtures/gerar.ts)
+
+## T-02.2 — UTF-8 sem BOM
+
+A spec manda decodificar em Latin-1 e usar UTF-8 só com BOM, mas a fixture
+`relatorio-9998-virgula.csv` da T-02.1 é UTF-8 sem BOM, como sai de muitas planilhas. Lida como
+Latin-1, ela teria os acentos quebrados ("InternaÃ§Ã£o"). A decodificação continua em Latin-1 por
+padrão e usa UTF-8 com BOM. Sem BOM, também usa UTF-8 quando há bytes acima de 0x7F e todos formam
+UTF-8 válido, o que um Latin-1 acentuado praticamente nunca faz. Se o dono preferir a regra estrita,
+basta tirar esse ramo e trocar a fixture por Latin-1.
+
+## T-02.2 (rodada 1)
+
+- Heurística extra de UTF-8 sem BOM vai além da spec (documentada em _pendencias.md) (src/relatorio/decodificar.ts)
+- Parâmetro `nome` de decodificarRelatorio não é usado (src/relatorio/decodificar.ts)

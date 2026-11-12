@@ -7,7 +7,7 @@
     - Variantes em UTF-8 com BOM, CSV com `;` e `.xlsx`.
     - Uma fixture para cada caso de borda.
 
-- [ ] **T-02.2 — Decodificação e detecção de formato**
+- [x] **T-02.2 — Decodificação e detecção de formato**
   - Depende de: T-02.1
   - Aceite:
     - Detecta tabulado, CSV ou xlsx pelo conteúdo.
