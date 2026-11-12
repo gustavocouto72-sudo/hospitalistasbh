@@ -14,7 +14,7 @@
     - Scripts `typecheck`, `lint` e `test`.
     - Teste-sentinela verde.
 
-- [ ] **T-01.3 — Tailwind e estrutura de pastas**
+- [x] **T-01.3 — Tailwind e estrutura de pastas**
   - Depende de: T-01.1
   - Aceite:
     - Tailwind funcionando.
