@@ -27,7 +27,7 @@
     - `.claude/skills/impeccable` copiada do OncoWay, junto com LICENSE e NOTICE.
     - `CLAUDE.md` com leitura obrigatória (PRD e specs) e regras.
 
-- [ ] **T-01.5 — Porta e segredos**
+- [x] **T-01.5 — Porta e segredos**
   - Depende de: T-01.1
   - Aceite:
     - Porta 3010 registrada em `~/Antigravity/PORTS.md`.

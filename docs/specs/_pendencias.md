@@ -43,3 +43,9 @@ reescrever as specs. Ajustar se o dono preferir outro estilo.
 - NOTICE cita os caminhos skill/reference/ios.md e android.md, mas na cópia eles ficam em impeccable/reference/ (.claude/skills/NOTICE-impeccable.md)
 - Não foi possível comparar a cópia com a fonte do OncoWay, que não foi localizada nesta máquina (.claude/skills/impeccable)
 - Status da task ainda em [~]; quem muda o status é o enxuto.mjs (docs/specs/SPEC-01-fundacao/tasks.md)
+
+## T-01.5 (rodada 1)
+
+- Teste da porta é pulado quando ~/Antigravity/PORTS.md não existe (ex.: CI) (test/segredos.test.ts)
+- Pre-commit falha de propósito sem gitleaks instalado; pode atrapalhar contribuidores do repositório público (.githooks/pre-commit)
+- Regra de CPF só pega o formato com pontuação (.gitleaks.toml)
