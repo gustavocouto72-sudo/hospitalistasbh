@@ -11,9 +11,9 @@
   - Aceite:
     - Playwright falha se, depois de subir a fixture, houver requisição para outra origem.
 
-- [~] **T-07.3 — Repositório público e Vercel**
+- [x] **T-07.3 — Repositório público e Vercel**
   - Depende de: T-07.1
-  - Aprovada pelo dono em 12/11/2026 (MIT, nome hospitalistasbh). Repositório em github.com/gustavocouto72-sudo/hospitalistasbh e site em https://hospitalistasbh.vercel.app, publicado pela CLI. Falta ligar o repositório ao projeto da Vercel (o app da Vercel no GitHub precisa de acesso ao repositório) para publicar a cada push e ter prévia por PR.
+  - Aprovada pelo dono em 12/11/2026 (MIT, nome hospitalistasbh). Repositório em github.com/gustavocouto72-sudo/hospitalistasbh e site em https://hospitalistasbh.vercel.app, publicado pela CLI. Por decisão do dono, o GitHub não é ligado à Vercel: cada publicação é feita à mão com `vercel deploy --prod`, e não há prévia por PR.
   - Aceite:
     - Repositório criado e README pronto.
     - Projeto na Vercel ligado ao repositório, com prévia por PR.
