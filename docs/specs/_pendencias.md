@@ -175,3 +175,7 @@ sem pesar na média. Também ficou `null` a diferença de todos os setores quand
 ## T-03.3 (rodada 1)
 
 - Estado 'vazio' (0 médicos e carga 0) não previsto na spec; decisão registrada em _pendencias.md e precisa de confirmação do dono (src/calculo/tipos.ts)
+
+## T-03.4 (rodada 1)
+
+- Nome dos casos em it.each usa %d, que trunca valores com épsilon e deixa o rótulo ambíguo (src/calculo/semaforo.test.ts)

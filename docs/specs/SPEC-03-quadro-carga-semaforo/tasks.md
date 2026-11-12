@@ -23,7 +23,7 @@
     - `escalaPropria` fora da média; `semMedico` com carga e sem médicos.
     - Teste de propriedade das somas.
 
-- [ ] **T-03.4 — corDoSemaforo**
+- [x] **T-03.4 — corDoSemaforo**
   - Depende de: T-03.3
   - Aceite:
     - Cinco cores com as fronteiras da spec.

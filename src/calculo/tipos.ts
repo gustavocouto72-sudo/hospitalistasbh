@@ -111,3 +111,6 @@ export type Painel = {
   readonly media: number | null;
   readonly avisos: readonly AvisoPainel[];
 };
+
+/** Cor do semáforo, da mais folgada (`azulEscuro`) à mais carregada (`vermelho`) (SPEC-03, `corDoSemaforo`). */
+export type Cor = 'azulEscuro' | 'azulClaro' | 'verde' | 'amarelo' | 'vermelho';
