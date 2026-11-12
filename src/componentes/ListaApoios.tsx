@@ -113,7 +113,7 @@ function AvisoIncompleto({ aviso }: { readonly aviso: string }) {
   return (
     <div
       role="status"
-      className="flex gap-3 rounded-cartao border-t-2 border-semaforo-amarelo-traco bg-papel px-4 py-3"
+      className="flex gap-3 rounded-b-cartao border-t-2 border-semaforo-amarelo-traco bg-papel px-4 py-3"
     >
       <span className="mt-0.5 shrink-0 text-semaforo-amarelo-traco">
         <IconeAviso />

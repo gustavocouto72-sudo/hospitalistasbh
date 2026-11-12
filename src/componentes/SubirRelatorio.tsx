@@ -174,7 +174,7 @@ function Bloco({ tom, titulo, ajuda, papel, children }: PropsBloco) {
   const fio = tom === 'erro' ? 'border-semaforo-vermelho-traco' : 'border-semaforo-amarelo-traco';
   const icone = tom === 'erro' ? 'text-semaforo-vermelho-traco' : 'text-semaforo-amarelo-traco';
   return (
-    <div role={papel} className={`flex gap-3 rounded-cartao border-t-2 bg-papel px-4 py-3 ${fio}`}>
+    <div role={papel} className={`flex gap-3 rounded-b-cartao border-t-2 bg-papel px-4 py-3 ${fio}`}>
       <span className={`mt-0.5 shrink-0 ${icone}`}>{tom === 'erro' ? <IconeErro /> : <IconeAviso />}</span>
       <div className="flex min-w-0 flex-col gap-1">
         <p className="text-rotulo font-semibold">{titulo}</p>

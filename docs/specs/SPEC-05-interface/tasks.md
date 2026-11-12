@@ -36,7 +36,7 @@
     - Seletor Antes/Depois.
     - Aviso quando `completo: false`.
 
-- [ ] **T-05.6 — Testes de componente e ponta a ponta**
+- [x] **T-05.6 — Testes de componente e ponta a ponta**
   - Depende de: T-05.5
   - Aceite:
     - Testing Library e Playwright (celular e desktop) verdes com a fixture.

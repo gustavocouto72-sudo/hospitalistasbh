@@ -314,3 +314,19 @@ o `DESIGN.md` ao fim do loop. Também ficou de fora o modo escuro: só há tema 
 - Lista de apoios posicionada antes dos cartões, diferente da ordem da SPEC-05 (decisão registrada em _pendencias.md) (src/componentes/Pagina.tsx)
 - Testes de componente usam renderToStaticMarkup, sem interação via Testing Library (aceitar/remover/alternar Antes/Depois por clique) como a spec sugere (src/componentes/lista-apoios.test.ts)
 - Par removido fica em 'descartados' de forma permanente; se readicionado manualmente entra aceito, mas a sugestão daquele par não volta sozinha (src/componentes/apoios-dia.ts)
+
+## T-05.6 — Testes de componente e ponta a ponta
+
+- **Ponta a ponta sobre o build estático.** O Next 16 não aceita `next start` com `output: 'export'`, então
+  o Playwright roda `pnpm build` e serve o `out/` na 3010 com `scripts/servir-estatico.mjs` (Node puro, só em
+  127.0.0.1). Se a 3010 estiver ocupada, o `pnpm e2e` para sem matar nada. O mesmo script pode virar o
+  `preview` da pendência da T-01.1, se o dono quiser.
+- **Chromium do Playwright** é baixado fora do repositório (`pnpm exec playwright install chromium`).
+- **Revisão final da impeccable:** sem achados altos em 360 px e 1280 px. O detector acusa
+  `border-accent-on-rounded` nos blocos de aviso (fio superior de 2 px do DESIGN.md); os cantos de cima
+  ficaram retos (`rounded-b-cartao`) para o fio não curvar, e o aviso que sobra é falso positivo do detector.
+
+## T-05.6 (rodada 1)
+
+- O servidor estático do e2e não trata URL malformada: decodeURIComponent pode lançar erro e derrubar o servidor (scripts/servir-estatico.mjs)
+- No e2e, a troca Antes/Depois clica no texto do rótulo em vez de usar o papel radio, como faz o teste de componente (e2e/amostra.spec.ts)

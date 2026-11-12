@@ -10,3 +10,5 @@ next-env.d.ts
 scripts/loop/
 docs/
 *.md
+test-results/
+playwright-report/
