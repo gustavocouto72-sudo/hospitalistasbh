@@ -65,7 +65,8 @@ export function Pagina() {
   const [geradaEm, setGeradaEm] = useState<Date | null>(null);
   useEffect(() => {
     const renovar = () => flushSync(() => setGeradaEm(new Date()));
-    renovar();
+    // Na montagem, sem flushSync: o React já está renderizando e reclamaria.
+    setGeradaEm(new Date());
     window.addEventListener('beforeprint', renovar);
     return () => window.removeEventListener('beforeprint', renovar);
   }, []);
