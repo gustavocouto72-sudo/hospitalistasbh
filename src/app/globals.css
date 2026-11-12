@@ -82,3 +82,9 @@
     }
   }
 }
+
+/* Folha de impressão (SPEC-06): A4 retrato, com margem que cabe em qualquer impressora. */
+@page {
+  size: A4 portrait;
+  margin: 12mm;
+}

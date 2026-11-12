@@ -330,3 +330,8 @@ o `DESIGN.md` ao fim do loop. Também ficou de fora o modo escuro: só há tema 
 
 - O servidor estático do e2e não trata URL malformada: decodeURIComponent pode lançar erro e derrubar o servidor (scripts/servir-estatico.mjs)
 - No e2e, a troca Antes/Depois clica no texto do rótulo em vez de usar o papel radio, como faz o teste de componente (e2e/amostra.spec.ts)
+
+## T-06.1 (rodada 1)
+
+- Sem dados carregados, imprimir mostra a tela interativa com controles (o main só recebe print:hidden quando há folha) (src/componentes/Pagina.tsx)
+- Critério de Safari e PDF no celular depende de conferência manual, prevista na T-06.2 (docs/specs/SPEC-06-impressao-pdf/spec.md)

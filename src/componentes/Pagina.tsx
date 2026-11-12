@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { flushSync } from 'react-dom';
 import { chaveDoDia, dataDaChave, tipoDiaPadrao } from '@/calculo/tipo-dia';
 import type { TipoDia } from '@/calculo/tipos';
 import { textos } from '@/textos';
@@ -34,6 +35,7 @@ import {
   sugestaoDoDia,
   trocarApoiador,
 } from './apoios-dia';
+import { FolhaImpressao } from './FolhaImpressao';
 import { ListaApoios } from './ListaApoios';
 import { painelDoDia } from './painel-dia';
 import { QuadroPadrao } from './QuadroPadrao';
@@ -48,11 +50,24 @@ import { Topo } from './Topo';
 const semAssinatura = () => () => undefined;
 const chaveDeHoje = () => chaveDoDia(new Date());
 const semDia = () => null;
+// Endereço do site para o rodapé da folha impressa; vazio no HTML do build.
+const enderecoDoSite = () => window.location.host;
+const semEndereco = () => '';
 
 export function Pagina() {
   const chave = useSyncExternalStore(semAssinatura, chaveDeHoje, semDia);
   const hoje = chave ? dataDaChave(chave) : null;
   const padrao = hoje ? tipoDiaPadrao(hoje) : null;
+
+  const endereco = useSyncExternalStore(semAssinatura, enderecoDoSite, semEndereco);
+  // Hora em que a folha foi gerada: a da abertura da página, renovada a cada impressão.
+  const [geradaEm, setGeradaEm] = useState<Date | null>(null);
+  useEffect(() => {
+    const renovar = () => flushSync(() => setGeradaEm(new Date()));
+    renovar();
+    window.addEventListener('beforeprint', renovar);
+    return () => window.removeEventListener('beforeprint', renovar);
+  }, []);
 
   const [estado, setEstado] = useState(ESTADO_INICIAL);
   const tipoDia = tipoDiaAtual(estado, padrao);
@@ -104,48 +119,57 @@ export function Pagina() {
   const vistaPainel = painel ? painelDaVista(painel, lista, apoios.vista) : null;
   const aplicados = apoios.vista === 'depois' ? apoiosAceitos(lista) : [];
 
+  const imprimivel = painel && tipoDia && geradaEm && fonte.tipo !== 'nenhuma';
+
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 pt-6 pb-12 sm:px-8">
-      <Topo hoje={hoje} tipoDia={tipoDia} aoEscolher={trocarTipoDia} />
-      <SubirRelatorio entrada={entrada} aoEscolherArquivo={escolherArquivo} aoPreencherAMao={abrirAMao} />
-      {painel && sugestao && vistaPainel && fonte.tipo !== 'nenhuma' ? (
-        <>
-          <ResumoDia painel={vistaPainel} />
-          <ListaApoios
-            painel={painel}
-            lista={lista}
-            completo={sugestao.completo}
-            aviso={sugestao.aviso}
-            vista={apoios.vista}
-            aoAceitar={(apoio) => setApoios((atual) => aceitarApoio(atual, apoio))}
-            aoEditarLeitos={(apoio, leitos) => setApoios((atual) => editarLeitos(atual, apoio, leitos))}
-            aoTrocarApoiador={(apoio, de) => setApoios((atual) => trocarApoiador(atual, apoio, de))}
-            aoRemover={(apoio) => setApoios((atual) => removerApoio(atual, apoio))}
-            aoAdicionar={(apoio) => setApoios((atual) => adicionarApoio(atual, apoio))}
-            aoEscolherVista={(vista) => setApoios((atual) => escolherVista(atual, vista))}
-          />
-          <QuadroSetores
-            painel={vistaPainel}
-            postos={postos}
-            ajustes={ajustes}
-            fonte={fonte.tipo}
-            apoios={aplicados}
-            legenda={
-              apoios.vista === 'antes'
-                ? textos.apoio.lista.vista.notaAntes
-                : textos.apoio.lista.vista.notaDepois(aplicados.length)
-            }
-            aoAjustarMedicos={(setor, semAjuste, sentido) =>
-              setEstado((atual) => ajustarMedicos(atual, setor, semAjuste, sentido))
-            }
-            aoAjustarContagem={(posto, campo, valor) =>
-              setEstado((atual) => ajustarContagem(atual, posto, campo, valor))
-            }
-          />
-        </>
-      ) : quadro ? (
-        <QuadroPadrao quadro={quadro} />
+    <>
+      <main
+        className={`mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 pt-6 pb-12 sm:px-8 ${imprimivel ? 'print:hidden' : ''}`}
+      >
+        <Topo hoje={hoje} tipoDia={tipoDia} aoEscolher={trocarTipoDia} />
+        <SubirRelatorio entrada={entrada} aoEscolherArquivo={escolherArquivo} aoPreencherAMao={abrirAMao} />
+        {painel && sugestao && vistaPainel && fonte.tipo !== 'nenhuma' ? (
+          <>
+            <ResumoDia painel={vistaPainel} />
+            <ListaApoios
+              painel={painel}
+              lista={lista}
+              completo={sugestao.completo}
+              aviso={sugestao.aviso}
+              vista={apoios.vista}
+              aoAceitar={(apoio) => setApoios((atual) => aceitarApoio(atual, apoio))}
+              aoEditarLeitos={(apoio, leitos) => setApoios((atual) => editarLeitos(atual, apoio, leitos))}
+              aoTrocarApoiador={(apoio, de) => setApoios((atual) => trocarApoiador(atual, apoio, de))}
+              aoRemover={(apoio) => setApoios((atual) => removerApoio(atual, apoio))}
+              aoAdicionar={(apoio) => setApoios((atual) => adicionarApoio(atual, apoio))}
+              aoEscolherVista={(vista) => setApoios((atual) => escolherVista(atual, vista))}
+            />
+            <QuadroSetores
+              painel={vistaPainel}
+              postos={postos}
+              ajustes={ajustes}
+              fonte={fonte.tipo}
+              apoios={aplicados}
+              legenda={
+                apoios.vista === 'antes'
+                  ? textos.apoio.lista.vista.notaAntes
+                  : textos.apoio.lista.vista.notaDepois(aplicados.length)
+              }
+              aoAjustarMedicos={(setor, semAjuste, sentido) =>
+                setEstado((atual) => ajustarMedicos(atual, setor, semAjuste, sentido))
+              }
+              aoAjustarContagem={(posto, campo, valor) =>
+                setEstado((atual) => ajustarContagem(atual, posto, campo, valor))
+              }
+            />
+          </>
+        ) : quadro ? (
+          <QuadroPadrao quadro={quadro} />
+        ) : null}
+      </main>
+      {imprimivel ? (
+        <FolhaImpressao painel={painel} lista={lista} tipoDia={tipoDia} geradaEm={geradaEm} endereco={endereco} />
       ) : null}
-    </main>
+    </>
   );
 }

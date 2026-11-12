@@ -6,6 +6,8 @@ const DATA_POR_EXTENSO = new Intl.DateTimeFormat('pt-BR', {
   month: 'long',
   year: 'numeric',
 });
+const DATA_CURTA = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+const HORA = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' });
 const NUMERO = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 });
 const COM_SINAL = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 1,
@@ -168,6 +170,29 @@ export const textos = {
       mediaIndefinida:
         'Nenhum setor tem médicos, então não há média do dia. Informe os médicos de cada setor para calcular a carga.',
     },
+  },
+  folha: {
+    titulo: 'Divisão dos hospitalistas',
+    /** "Gerada em 12/11/2026 às 09:05". */
+    geradaEm: (data: Date) => `Gerada em ${DATA_CURTA.format(data)} às ${HORA.format(data)}`,
+    tipoDia: 'Tipo de dia',
+    tabela: 'Carga por setor',
+    colunas: {
+      setor: 'Setor',
+      postos: 'Postos',
+      medicos: 'Médicos',
+      pacientes: 'Pacientes',
+      antes: 'Por médico antes',
+      depois: 'Por médico depois',
+      cor: 'Semáforo',
+    },
+    semConta: '—',
+    apoios: 'Apoios aceitos',
+    semApoios: 'Nenhum apoio aceito.',
+    media: 'Média do dia',
+    medicos: 'Médicos',
+    pacientes: 'Pacientes',
+    gerado: (endereco: string) => `Gerado em ${endereco}. Nenhum dado foi guardado.`,
   },
   apoio: {
     erros: {

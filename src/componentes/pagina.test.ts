@@ -95,6 +95,25 @@ describe('Página — Testing Library', () => {
     expect(porMedico(cartao(container, para))).toBe(antes);
   });
 
+  it('na impressão, os controles somem e a folha aparece só com os apoios aceitos', async () => {
+    const { usuario, container } = await subirFixture();
+    const controles = container.querySelector('main');
+    expect(controles?.className).toMatch(/\bprint:hidden\b/);
+    const folha = () => {
+      const elemento = container.querySelector<HTMLElement>('section[data-folha]');
+      if (!elemento) throw new Error('sem folha de impressão');
+      return elemento;
+    };
+    expect(folha().className).toMatch(/\bhidden\b.*\bprint:flex\b/);
+    expect(within(folha()).getByText(textos.folha.semApoios)).toBeTruthy();
+    expect(folha().querySelectorAll('button, input, select')).toHaveLength(0);
+
+    const [primeiro] = itensDeApoio(container);
+    await usuario.click(within(primeiro!).getByRole('button', { name: /^Aceitar: / }));
+    expect(within(folha()).queryByText(textos.folha.semApoios)).toBeNull();
+    expect(within(folha()).getAllByRole('listitem')).toHaveLength(1);
+  });
+
   it('o fim de semana troca o quadro e zera os apoios', async () => {
     const { usuario, container } = await subirFixture();
     await usuario.click(screen.getByRole('radio', { name: textos.topo.tipoDia.fimDeSemana }));

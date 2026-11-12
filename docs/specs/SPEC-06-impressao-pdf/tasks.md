@@ -1,6 +1,6 @@
 # Tasks — SPEC-06 Impressão e PDF
 
-- [ ] **T-06.1 — Folha de impressão**
+- [x] **T-06.1 — Folha de impressão**
   - Depende de: T-05.5
   - Aceite:
     - CSS `@media print` com cabeçalho, tabela, apoios e rodapé da spec.
