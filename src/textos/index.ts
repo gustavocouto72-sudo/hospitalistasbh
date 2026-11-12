@@ -7,6 +7,14 @@ const DATA_POR_EXTENSO = new Intl.DateTimeFormat('pt-BR', {
   year: 'numeric',
 });
 const NUMERO = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 });
+const COM_SINAL = new Intl.NumberFormat('pt-BR', {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
+  signDisplay: 'exceptZero',
+});
+
+/** Número com uma casa decimal, no máximo: "6,7", "18", "2,5". */
+const numero = (valor: number) => NUMERO.format(valor);
 
 const MOTIVO: Record<MotivoContagemInvalida, string> = {
   vazio: 'está vazio',
@@ -40,6 +48,57 @@ export const textos = {
     totalMedicos: 'Total de médicos',
     juntarPostos: (postos: readonly string[]) => postos.join(' + '),
     numero: (valor: number) => NUMERO.format(valor),
+  },
+  semaforo: {
+    azulEscuro: 'Muito abaixo da média',
+    azulClaro: 'Abaixo da média',
+    verde: 'Na média',
+    amarelo: 'Acima da média',
+    vermelho: 'Sobrecarregado',
+    semMedico: 'Sem médico',
+    vazio: 'Sem pacientes',
+    escalaPropria: 'Escala própria',
+  },
+  cartao: {
+    titulo: 'Setores',
+    numero,
+    /** "+1,8", "−0,4" ou "0,0", com o sinal de menos tipográfico. */
+    diferenca: (valor: number) => COM_SINAL.format(valor).replace('-', '−'),
+    porMedico: 'pacientes por médico',
+    daMedia: 'da média',
+    semMedico: (pacientes: number) => `${pacientes === 1 ? 'paciente' : 'pacientes'} sem médico`,
+    pacientes: (pacientes: number) => (pacientes === 1 ? 'paciente' : 'pacientes'),
+    medicos: 'Médicos',
+    menosMedico: (setor: string) => `Tirar meio médico do ${setor}`,
+    maisMedico: (setor: string) => `Pôr meio médico no ${setor}`,
+    posto: 'Posto',
+    linhas: {
+      hospitalistas: 'Hospitalistas',
+      cardioGeriatria: 'Cardio e geriatria',
+      potenciaisAdmissoes: 'Potenciais admissões',
+    },
+    campo: {
+      hospitalistas: (posto: string) => `Pacientes dos hospitalistas no posto ${posto}`,
+      cardioGeriatria: (posto: string) => `Pacientes da cardiologia e da geriatria no posto ${posto}`,
+      potenciaisAdmissoes: (posto: string) => `Potenciais admissões no posto ${posto}`,
+    },
+    campoInvalido: 'Digite um número inteiro, de 0 para cima.',
+    escalaPropriaNota: 'Fora da média do dia e do semáforo.',
+    postoAusente: (posto: string) => `O posto ${posto} não veio no relatório.`,
+    foraDoQuadro: 'Posto fora do quadro, entrou como setor sem médico.',
+    ocultos: {
+      resumo: (n: number) => (n === 1 ? '1 posto oculto, zerado' : `${n} postos ocultos, zerados`),
+      explicacao: 'Postos fora do quadro que vieram sem pacientes.',
+      lista: (postos: readonly string[]) => postos.join(', '),
+    },
+  },
+  resumo: {
+    titulo: 'Resumo do dia',
+    media: 'Média por médico',
+    medicos: 'Médicos',
+    pacientes: 'Pacientes',
+    cores: 'Setores por cor',
+    setores: (n: number) => (n === 1 ? '1 setor' : `${n} setores`),
   },
   subir: {
     titulo: 'Relatório do dia',

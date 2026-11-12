@@ -8,10 +8,21 @@ import {
   descartarContagens,
   iniciarLeitura,
   lerArquivo,
+  postosDaFonte,
   preencherAMao,
 } from './entrada';
-import { ESTADO_INICIAL, escolherTipoDia, quadroDoDia, tipoDiaAtual } from './estado-dia';
+import {
+  ESTADO_INICIAL,
+  ajustarContagem,
+  ajustarMedicos,
+  escolherTipoDia,
+  quadroDoDia,
+  tipoDiaAtual,
+} from './estado-dia';
+import { painelDoDia } from './painel-dia';
 import { QuadroPadrao } from './QuadroPadrao';
+import { QuadroSetores } from './QuadroSetores';
+import { ResumoDia } from './ResumoDia';
 import { SubirRelatorio } from './SubirRelatorio';
 import { Topo } from './Topo';
 
@@ -31,7 +42,7 @@ export function Pagina() {
   const tipoDia = tipoDiaAtual(estado, padrao);
   const quadro = quadroDoDia(tipoDia);
 
-  // A fonte das contagens (relatório ou preenchimento à mão) chega aos cartões na T-05.4.
+  // A fonte das contagens: o relatório subido ou o preenchimento à mão.
   const [entrada, setEntrada] = useState(ENTRADA_INICIAL);
   // Só a última leitura pedida vale: um arquivo lento não sobrescreve outro escolhido depois.
   const ultimaLeitura = useRef(0);
@@ -51,6 +62,11 @@ export function Pagina() {
     setEstado(descartarContagens);
   }
 
+  // Os números se refazem a cada render, sem botão "calcular".
+  const { fonte } = entrada;
+  const postos = postosDaFonte(fonte);
+  const painel = tipoDia && fonte.tipo !== 'nenhuma' ? painelDoDia(postos, tipoDia, estado.ajustes) : null;
+
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 pt-6 pb-12 sm:px-8">
       <Topo
@@ -59,7 +75,25 @@ export function Pagina() {
         aoEscolher={(tipo) => setEstado((atual) => escolherTipoDia(atual, tipo, padrao))}
       />
       <SubirRelatorio entrada={entrada} aoEscolherArquivo={escolherArquivo} aoPreencherAMao={abrirAMao} />
-      {quadro ? <QuadroPadrao quadro={quadro} /> : null}
+      {painel && fonte.tipo !== 'nenhuma' ? (
+        <>
+          <ResumoDia painel={painel} />
+          <QuadroSetores
+            painel={painel}
+            postos={postos}
+            ajustes={estado.ajustes}
+            fonte={fonte.tipo}
+            aoAjustarMedicos={(setor, semAjuste, sentido) =>
+              setEstado((atual) => ajustarMedicos(atual, setor, semAjuste, sentido))
+            }
+            aoAjustarContagem={(posto, campo, valor) =>
+              setEstado((atual) => ajustarContagem(atual, posto, campo, valor))
+            }
+          />
+        </>
+      ) : quadro ? (
+        <QuadroPadrao quadro={quadro} />
+      ) : null}
     </main>
   );
 }

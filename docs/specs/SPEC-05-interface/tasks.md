@@ -21,7 +21,7 @@
     - Frase de privacidade.
     - Opção "Preencher à mão".
 
-- [ ] **T-05.4 — Cartões de setor e resumo do dia**
+- [x] **T-05.4 — Cartões de setor e resumo do dia**
   - Depende de: T-05.2, T-03.5
   - Aceite:
     - Edição de médicos (passos de 0,5) e de contagens.

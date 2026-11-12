@@ -290,3 +290,8 @@ o `DESIGN.md` ao fim do loop. Também ficou de fora o modo escuro: só há tema 
 
 - O bloco de falha fica fora da região aria-live, mas é anunciado pelo role="alert" (src/componentes/SubirRelatorio.tsx)
 - Status da task mudado à mão para [~] no tasks.md, quando a regra do loop é mudar só pelo enxuto.mjs (docs/specs/SPEC-05-interface/tasks.md)
+
+## T-05.4 (rodada 1)
+
+- Condição fonte.tipo !== 'nenhuma' repetida no cálculo de painel e no JSX (src/componentes/Pagina.tsx)
+- contagensPorPosto passou a ser exportada só para a interface, aumentando a API pública do cálculo (src/calculo/montar-quadro.ts)

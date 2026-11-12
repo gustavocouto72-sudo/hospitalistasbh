@@ -37,7 +37,7 @@ function validarContagem(posto: string, campo: string, valor: number): number {
  * Contagens por posto, na ordem do relatório e depois na dos ajustes. Se o mesmo posto vier repetido,
  * vale a primeira linha, como na leitura (SPEC-02).
  */
-function contagensPorPosto(postos: readonly ContagemDoPosto[], ajustes: Ajustes): Map<string, Contagens> {
+export function contagensPorPosto(postos: readonly ContagemDoPosto[], ajustes: Ajustes): Map<string, Contagens> {
   const porPosto = new Map<string, Contagens>();
   for (const { codigo, hospitalistas, cardioGeriatria, potenciaisAdmissoes } of postos) {
     if (!porPosto.has(codigo)) porPosto.set(codigo, { hospitalistas, cardioGeriatria, potenciaisAdmissoes });
