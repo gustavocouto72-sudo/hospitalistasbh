@@ -1,20 +1,20 @@
 // @vitest-environment jsdom
 /**
- * Testes de componente da página inteira (SPEC-05, "Testes esperados"), com Testing Library: subir a fixture
- * sintética da amostra, editar médicos, aceitar e remover um apoio e alternar Antes/Depois.
+ * Testes de componente da página inteira, com Testing Library: subir a fixture sintética da amostra, ler a
+ * planilha, editar médicos e contagens, mexer na recomendação de apoio e imprimir.
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { textos } from '@/textos';
 import { Pagina } from './Pagina';
 
 const FIXTURE = 'relatorio-9998-latin1.xls';
 const bytes = readFileSync(resolve(process.cwd(), 'test/fixtures', FIXTURE));
-const t = textos.apoio.lista;
 
 beforeEach(() => {
   // Quinta-feira, 12/11/2026: o padrão é dia de semana. Só a data é falsa, os timers seguem reais.
@@ -27,94 +27,142 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-async function subirFixture() {
-  const usuario = userEvent.setup();
+async function subir(arquivo: File) {
+  const usuario = userEvent.setup({ applyAccept: false });
   const { container } = render(createElement(Pagina));
   const seletor = container.querySelector<HTMLInputElement>('input[type="file"]');
   if (!seletor) throw new Error('sem seletor de arquivo');
-  await usuario.upload(seletor, new File([bytes], FIXTURE, { type: 'application/vnd.ms-excel' }));
-  await screen.findByText(/postos lidos\./);
+  await usuario.upload(seletor, arquivo);
   return { usuario, container };
 }
 
-const cartao = (container: HTMLElement, setor: string) => {
-  const elemento = container.querySelector<HTMLElement>(`article[data-setor="${setor}"]`);
-  if (!elemento) throw new Error(`sem cartão do setor ${setor}`);
+async function subirFixture() {
+  const resultado = await subir(new File([bytes], FIXTURE, { type: 'application/vnd.ms-excel' }));
+  await screen.findByText(/postos lidos\./);
+  return resultado;
+}
+
+const linha = (container: HTMLElement, setor: string) => {
+  const elemento = container.querySelector<HTMLElement>(`main tr[data-setor="${setor}"]`);
+  if (!elemento) throw new Error(`sem linha do setor ${setor}`);
   return elemento;
 };
 
-const porMedico = (elemento: HTMLElement) =>
-  within(elemento).getByText(textos.cartao.porMedico).previousSibling?.textContent;
+const celula = (container: HTMLElement, setor: string, coluna: string) => {
+  const elemento = linha(container, setor).querySelector<HTMLElement>(`[data-coluna="${coluna}"]`);
+  if (!elemento) throw new Error(`sem coluna ${coluna} no setor ${setor}`);
+  return elemento;
+};
+
+const porMedico = (container: HTMLElement, setor: string) => celula(container, setor, 'por-medico').textContent;
+const comApoio = (container: HTMLElement, setor: string) =>
+  celula(container, setor, 'com-apoio').querySelector('[data-valor]')?.textContent;
 
 const itensDeApoio = (container: HTMLElement) => Array.from(container.querySelectorAll<HTMLElement>('li[data-apoio]'));
 
 describe('Página — Testing Library', () => {
-  it('sobe a fixture e mostra os cartões, o resumo e a sugestão de apoio', async () => {
+  it('antes do relatório, mostra a planilha com os médicos do dia e as contagens vazias', () => {
+    const { container } = render(createElement(Pagina));
+    expect(linha(container, '4.2').textContent).toContain('2,5');
+    expect(porMedico(container, '4.2')).toBe('—');
+    expect(screen.getByText(textos.recomendacao.semDados)).toBeTruthy();
+  });
+
+  it('sobe a fixture e mostra a planilha com a situação e a recomendação aplicada', async () => {
     const { container } = await subirFixture();
-    expect(screen.getByRole('heading', { name: textos.resumo.titulo })).toBeTruthy();
-    expect(screen.getByRole('heading', { name: t.titulo })).toBeTruthy();
-    expect(porMedico(cartao(container, '4.3'))).toBe('11,5');
-    expect(within(cartao(container, '4.3')).getByText(textos.semaforo.amarelo)).toBeTruthy();
+    expect(porMedico(container, '4.3')).toBe('11,5');
+    expect(celula(container, '4.3', 'situacao').textContent).toBe(textos.semaforo.amarelo);
+    expect(celula(container, '4.4', 'situacao').textContent).toBe(textos.semaforo.verde);
+    expect(celula(container, '3.1', 'situacao').textContent).toBe(textos.semaforo.escalaPropria);
+    expect(screen.getByRole('heading', { name: textos.recomendacao.titulo })).toBeTruthy();
     expect(itensDeApoio(container).length).toBeGreaterThan(0);
+    // A recomendação já vale: todo setor na coluna "Com apoio" fica no verde.
+    for (const setor of ['2', '4.2', '4.3', '4.4', '4.5', '6.1', '6.2', '6.3']) {
+      expect(celula(container, setor, 'situacao-com-apoio').textContent).toBe(textos.semaforo.verde);
+    }
     expect(screen.getByText(textos.subir.privacidade)).toBeTruthy();
   });
 
-  it('editar médicos recalcula o cartão na hora', async () => {
+  it('editar médicos recalcula a linha na hora', async () => {
     const { usuario, container } = await subirFixture();
-    const setor = cartao(container, '4.3');
+    const setor = linha(container, '4.3');
     await usuario.click(within(setor).getByRole('button', { name: textos.cartao.maisMedico('4.3') }));
     // 23 pacientes com 2,5 médicos.
-    expect(within(setor).getByText('2,5')).toBeTruthy();
-    expect(porMedico(cartao(container, '4.3'))).toBe('9,2');
+    expect(porMedico(container, '4.3')).toBe('9,2');
     await usuario.click(within(setor).getByRole('button', { name: textos.cartao.menosMedico('4.3') }));
-    expect(porMedico(cartao(container, '4.3'))).toBe('11,5');
+    expect(porMedico(container, '4.3')).toBe('11,5');
   });
 
-  it('aceita e remove um apoio, e o Antes/Depois troca os números dos cartões', async () => {
+  it('editar as contagens abre os campos por posto e recalcula', async () => {
+    const { usuario, container } = await subirFixture();
+    await usuario.click(screen.getByRole('button', { name: textos.planilha.editar }));
+    const campo = screen.getByRole('textbox', { name: textos.cartao.campo.hospitalistas('4.3') });
+    await usuario.clear(campo);
+    await usuario.type(campo, '30');
+    expect(porMedico(container, '4.3')).toBe('15');
+    await usuario.click(screen.getByRole('button', { name: textos.planilha.pronto }));
+    expect(screen.queryByRole('textbox', { name: textos.cartao.campo.hospitalistas('4.3') })).toBeNull();
+  });
+
+  it('remover um apoio tira a nota e devolve a carga sem apoio na coluna "Com apoio"', async () => {
     const { usuario, container } = await subirFixture();
     const [primeiro] = itensDeApoio(container);
     if (!primeiro) throw new Error('sem apoio sugerido');
-    const [de, para] = (primeiro.dataset.apoio ?? '').split('→') as [string, string];
-    const antes = porMedico(cartao(container, para));
+    const [, para] = (primeiro.dataset.apoio ?? '').split('→') as [string, string];
+    const antes = porMedico(container, para);
+    expect(comApoio(container, para)).not.toBe(antes);
 
-    await usuario.click(within(primeiro).getByRole('button', { name: /^Aceitar: / }));
-    expect(within(itensDeApoio(container)[0]!).getByText(t.aceito)).toBeTruthy();
-
-    await usuario.click(screen.getByRole('radio', { name: t.vista.depois }));
-    expect(screen.getByText(t.vista.notaDepois(1), { selector: 'p[aria-live]' })).toBeTruthy();
-    expect(porMedico(cartao(container, para))).not.toBe(antes);
-    expect(within(cartao(container, de)).getByText(new RegExp(`^Apoia .* do ${para}\\.$`))).toBeTruthy();
-
-    await usuario.click(screen.getByRole('radio', { name: t.vista.antes }));
-    expect(porMedico(cartao(container, para))).toBe(antes);
-
-    await usuario.click(screen.getByRole('radio', { name: t.vista.depois }));
-    const aceito = container.querySelector<HTMLElement>(`li[data-apoio="${de}→${para}"]`)!;
-    await usuario.click(within(aceito).getByRole('button', { name: /^Remover: / }));
-    await waitFor(() => expect(container.querySelector(`li[data-apoio="${de}→${para}"]`)).toBeNull());
-    expect(porMedico(cartao(container, para))).toBe(antes);
+    await usuario.click(within(primeiro).getByRole('button', { name: /^Remover: / }));
+    await waitFor(() => expect(container.querySelector(`li[data-apoio="${primeiro.dataset.apoio}"]`)).toBeNull());
+    expect(comApoio(container, para)).toBe(antes);
   });
 
-  it('na impressão, os controles somem e a folha aparece só com os apoios aceitos', async () => {
+  it('mais um leito no apoio muda a coluna "Com apoio" do apoiado', async () => {
     const { usuario, container } = await subirFixture();
-    const controles = container.querySelector('main');
-    expect(controles?.className).toMatch(/\bprint:hidden\b/);
+    const [primeiro] = itensDeApoio(container);
+    const [, para] = (primeiro!.dataset.apoio ?? '').split('→') as [string, string];
+    const antes = comApoio(container, para);
+    await usuario.click(within(primeiro!).getByRole('button', { name: /^Pôr um leito: / }));
+    expect(comApoio(container, para)).not.toBe(antes);
+  });
+
+  it('"Preencher à mão" zera a planilha e abre os campos', async () => {
+    const usuario = userEvent.setup();
+    const { container } = render(createElement(Pagina));
+    await usuario.click(screen.getByRole('button', { name: textos.subir.preencherAMao }));
+    expect(screen.getByText(textos.subir.resumo.manual)).toBeTruthy();
+    const campo = screen.getByRole('textbox', { name: textos.cartao.campo.hospitalistas('4.4') });
+    await usuario.clear(campo);
+    await usuario.type(campo, '20');
+    expect(porMedico(container, '4.4')).toBe('10');
+  });
+
+  it('um arquivo de outro formato vira erro legível', async () => {
+    await subir(new File(['%PDF'], 'laudo.pdf', { type: 'application/pdf' }));
+    expect(await screen.findByRole('alert')).toBeTruthy();
+    expect(screen.getByText(textos.subir.erros.extensao('laudo.pdf'))).toBeTruthy();
+  });
+
+  it('na impressão, os controles somem e a folha leva os apoios da recomendação', async () => {
+    const { usuario, container } = await subirFixture();
+    expect(container.querySelector('main')?.className).toMatch(/\bprint:hidden\b/);
     const folha = () => {
       const elemento = container.querySelector<HTMLElement>('section[data-folha]');
       if (!elemento) throw new Error('sem folha de impressão');
       return elemento;
     };
     expect(folha().className).toMatch(/\bhidden\b.*\bprint:flex\b/);
-    expect(within(folha()).getByText(textos.folha.semApoios)).toBeTruthy();
     expect(folha().querySelectorAll('button, input, select')).toHaveLength(0);
+    const quantos = itensDeApoio(container).length;
+    expect(within(folha()).getAllByRole('listitem')).toHaveLength(quantos);
 
-    const [primeiro] = itensDeApoio(container);
-    await usuario.click(within(primeiro!).getByRole('button', { name: /^Aceitar: / }));
-    expect(within(folha()).queryByText(textos.folha.semApoios)).toBeNull();
-    expect(within(folha()).getAllByRole('listitem')).toHaveLength(1);
+    for (const item of itensDeApoio(container)) {
+      await usuario.click(within(item).getByRole('button', { name: /^Remover: / }));
+    }
+    expect(within(folha()).getByText(textos.folha.semApoios)).toBeTruthy();
   });
 
-  it('o botão de imprimir chama window.print() e só aparece com o quadro do dia', async () => {
+  it('o botão de imprimir chama window.print() e só aparece com o relatório', async () => {
     const imprimir = vi.spyOn(window, 'print').mockImplementation(() => undefined);
     try {
       const vazio = render(createElement(Pagina));
@@ -131,10 +179,21 @@ describe('Página — Testing Library', () => {
     }
   });
 
-  it('o fim de semana troca o quadro e zera os apoios', async () => {
+  it('o fim de semana troca o quadro', async () => {
     const { usuario, container } = await subirFixture();
     await usuario.click(screen.getByRole('radio', { name: textos.topo.tipoDia.fimDeSemana }));
-    expect(within(cartao(container, '4.3')).getByText('1')).toBeTruthy();
-    expect(screen.getByText(t.vista.notaAntes, { selector: 'p[aria-live]' })).toBeTruthy();
+    expect(linha(container, '4.3').querySelector('output')?.textContent).toBe('1');
+    expect(container.querySelector('main tr[data-setor="3.1+6.1"]')).toBeTruthy();
+  });
+});
+
+describe('Pagina no servidor', () => {
+  it('não fixa o tipo de dia no HTML estático, porque o dia só é conhecido no aparelho', () => {
+    const html = renderToStaticMarkup(createElement(Pagina));
+    expect(html).toContain(textos.app.titulo);
+    expect(html).not.toMatch(/<input[^>]*\schecked/);
+    expect(html).toContain(textos.subir.escolher);
+    expect(html).toContain(textos.subir.privacidade);
+    expect(html).toContain(textos.subir.preencherAMao);
   });
 });

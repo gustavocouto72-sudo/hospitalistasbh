@@ -7,7 +7,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import type { ContagemDoPosto } from '@/calculo/tipos';
 import { textos } from '@/textos';
-import { APOIOS_INICIAL, aceitarApoio, listaDeApoios, sugestaoDoDia, type EstadoApoios } from './apoios-dia';
+import { APOIOS_INICIAL, listaDeApoios, removerApoio, sugestaoDoDia, type EstadoApoios } from './apoios-dia';
 import { FolhaImpressao } from './FolhaImpressao';
 import { folhaDoDia } from './folha-impressao';
 import { painelDoDia } from './painel-dia';
@@ -45,11 +45,18 @@ function montar(estado: EstadoApoios = APOIOS_INICIAL) {
   return { painel, sugestao, lista };
 }
 
-function comApoioAceito() {
+/** Só o primeiro apoio sugerido fica na lista; os outros são removidos. */
+function comUmApoio() {
   const { sugestao } = montar();
-  const [primeiro] = sugestao.apoios;
+  const [primeiro, ...resto] = sugestao.apoios;
   if (!primeiro) throw new Error('a amostra sintética precisa de um apoio sugerido');
-  return { apoio: primeiro, ...montar(aceitarApoio(APOIOS_INICIAL, primeiro)) };
+  return { apoio: primeiro, ...montar(resto.reduce((e, a) => removerApoio(e, a), APOIOS_INICIAL)) };
+}
+
+/** Todos os apoios sugeridos removidos. */
+function semApoio() {
+  const { sugestao } = montar();
+  return montar(sugestao.apoios.reduce((e, a) => removerApoio(e, a), APOIOS_INICIAL));
 }
 
 describe('folhaDoDia', () => {
@@ -63,8 +70,8 @@ describe('folhaDoDia', () => {
     expect(s42.pacientes).toBe('14');
   });
 
-  it('sem apoio aceito, antes e depois são iguais', () => {
-    const { painel, lista } = montar();
+  it('sem apoio na lista, antes e depois são iguais', () => {
+    const { painel, lista } = semApoio();
     const folha = folhaDoDia(painel, lista);
     const s43 = folha.linhas.find((l) => l.id === '4.3')!;
     expect(s43.antes).toBe('15');
@@ -73,19 +80,14 @@ describe('folhaDoDia', () => {
     expect(folha.apoios).toEqual([]);
   });
 
-  it('imprime só os apoios aceitos, em frases, e a cor do depois', () => {
-    const { painel, lista } = montar();
-    // Sem aceitar nada, as sugestões não vão para a folha.
-    expect(lista.length).toBeGreaterThan(0);
-    expect(folhaDoDia(painel, lista).apoios).toEqual([]);
-
-    const aceito = comApoioAceito();
-    const folha = folhaDoDia(aceito.painel, aceito.lista);
-    const nome = (id: string) => aceito.painel.setores.find((s) => s.id === id)!.nome;
+  it('imprime os apoios da lista, em frases, e a cor do depois', () => {
+    const com = comUmApoio();
+    const folha = folhaDoDia(com.painel, com.lista);
+    const nome = (id: string) => com.painel.setores.find((s) => s.id === id)!.nome;
     expect(folha.apoios).toEqual([
-      `${textos.apoio.lista.frase({ de: nome(aceito.apoio.de), para: nome(aceito.apoio.para), leitos: aceito.apoio.leitos })}.`,
+      `${textos.apoio.lista.frase({ de: nome(com.apoio.de), para: nome(com.apoio.para), leitos: com.apoio.leitos })}.`,
     ]);
-    const apoiado = folha.linhas.find((l) => l.id === aceito.apoio.para)!;
+    const apoiado = folha.linhas.find((l) => l.id === com.apoio.para)!;
     expect(apoiado.depois).not.toBe(apoiado.antes);
   });
 
@@ -111,7 +113,7 @@ describe('folhaDoDia', () => {
 });
 
 describe('FolhaImpressao', () => {
-  const html = (dados: Pick<ReturnType<typeof montar>, 'painel' | 'lista'> = comApoioAceito()) =>
+  const html = (dados: Pick<ReturnType<typeof montar>, 'painel' | 'lista'> = comUmApoio()) =>
     renderToStaticMarkup(
       createElement(FolhaImpressao, {
         painel: dados.painel,
@@ -126,7 +128,7 @@ describe('FolhaImpressao', () => {
     expect(html()).toMatch(/^<section[^>]*class="[^"]*\bhidden\b[^"]*\bprint:flex\b/);
   });
 
-  it('tem cabeçalho, tabela, apoios aceitos e rodapé da spec', () => {
+  it('tem cabeçalho, tabela, apoios e rodapé da spec', () => {
     const saida = html();
     expect(saida).toContain(t.titulo);
     expect(saida).toContain(t.geradaEm(GERADA_EM));
@@ -141,8 +143,8 @@ describe('FolhaImpressao', () => {
     expect(saida).not.toContain('<input');
   });
 
-  it('sem apoio aceito, diz que não houve apoio', () => {
-    expect(html(montar())).toContain(t.semApoios);
+  it('sem apoio na lista, diz que não houve apoio', () => {
+    expect(html(semApoio())).toContain(t.semApoios);
   });
 
   it('snapshot', () => {

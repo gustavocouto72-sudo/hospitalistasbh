@@ -94,6 +94,47 @@ export const textos = {
       lista: (postos: readonly string[]) => postos.join(', '),
     },
   },
+  planilha: {
+    titulo: 'Carga por setor',
+    colunas: {
+      setor: 'Setor',
+      medicos: 'Médicos',
+      pacientes: 'Pacientes',
+      cardioGeriatria: 'Cardio/geri',
+      potenciaisAdmissoes: 'Pot. admissões',
+      porMedico: 'Por médico',
+      diferenca: 'vs. média',
+      situacao: 'Situação',
+      comApoio: 'Com apoio',
+    },
+    grupoSemApoio: 'Sem apoio',
+    grupoComApoio: 'Com a recomendação',
+    total: 'Total',
+    media: (valor: string) => `média ${valor}`,
+    semDados: 'Suba o relatório 9998 ou preencha à mão para ver a carga de cada setor.',
+    editar: 'Editar contagens',
+    pronto: 'Pronto',
+    escalaPropria: 'Escala própria',
+    apoia: (setor: string, leitos: number) => `apoia ${setor} (${leitos})`,
+    apoiado: (setor: string, leitos: number) => `apoio do ${setor} (${leitos})`,
+  },
+  legenda: {
+    titulo: 'Legenda do semáforo',
+    faixa: {
+      azulEscuro: '(< −2)',
+      azulClaro: '(−2 a −1)',
+      verde: '(±1)',
+      amarelo: '(+1 a +2)',
+      vermelho: '(> +2)',
+    },
+  },
+  recomendacao: {
+    titulo: 'Recomendação de apoio',
+    nenhuma: 'Nenhum apoio necessário: todos os setores estão na média.',
+    semMedia: 'Sem média do dia, não há recomendação.',
+    semDados: 'A recomendação aparece depois do relatório.',
+    nota: 'Já aplicada na coluna “Com apoio”. Edite os leitos, troque quem apoia ou remova.',
+  },
   resumo: {
     titulo: 'Resumo do dia',
     media: 'Média por médico',
@@ -110,6 +151,7 @@ export const textos = {
     escolher: 'Escolher arquivo',
     trocar: 'Escolher outro arquivo',
     formatos: 'Aceita .xls, .csv e .xlsx.',
+    arrastar: 'Também dá para arrastar o arquivo (.xls, .csv ou .xlsx) para qualquer lugar da página.',
     privacidade: 'O arquivo é lido só neste aparelho. Nada é enviado nem guardado.',
     semRelatorio: 'Sem o relatório?',
     preencherAMao: 'Preencher à mão',
@@ -117,7 +159,7 @@ export const textos = {
       lido: (d: { nome: string; postos: number }) =>
         `${d.nome}: ${d.postos} ${d.postos === 1 ? 'posto lido' : 'postos lidos'}.`,
       nenhumPosto: (nome: string) => `${nome}: nenhum posto pôde ser lido. Veja os erros abaixo.`,
-      manual: 'Preenchimento à mão: o quadro começa zerado e as contagens são digitadas nos cartões.',
+      manual: 'Preenchimento à mão: a planilha começa zerada; digite as contagens de cada posto.',
       lendo: (nome: string) => `Lendo ${nome}…`,
     },
     erros: {
@@ -173,7 +215,7 @@ export const textos = {
   },
   imprimir: {
     botao: 'Imprimir ou gerar PDF',
-    nota: 'Sai a folha do dia, só com os apoios aceitos. Para o PDF, escolha “Salvar como PDF” no navegador.',
+    nota: 'Sai a folha do dia com a recomendação. Para o PDF, escolha “Salvar como PDF” no navegador.',
   },
   folha: {
     titulo: 'Divisão dos hospitalistas',
@@ -191,8 +233,8 @@ export const textos = {
       cor: 'Semáforo',
     },
     semConta: '—',
-    apoios: 'Apoios aceitos',
-    semApoios: 'Nenhum apoio aceito.',
+    apoios: 'Apoios',
+    semApoios: 'Nenhum apoio.',
     media: 'Média do dia',
     medicos: 'Médicos',
     pacientes: 'Pacientes',
@@ -216,6 +258,7 @@ export const textos = {
     lista: {
       titulo: 'Apoio entre setores',
       leitos: (n: number) => (n === 1 ? '1 leito' : `${n} leitos`),
+      palavraLeitos: (n: number) => (n === 1 ? 'leito' : 'leitos'),
       apoia: 'apoia',
       do: 'do',
       /** "4.5 apoia 3 leitos do 4.3", para leitores de tela e rótulos. */

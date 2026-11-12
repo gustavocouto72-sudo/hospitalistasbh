@@ -41,3 +41,11 @@
   - Aceite:
     - Testing Library e Playwright (celular e desktop) verdes com a fixture.
     - Revisão final da impeccable (finish) sem achados altos.
+
+- [x] **T-05.7 — Planilha única (revisão do dono, 12/11/2026)**
+  - Pedido do dono depois de ver o site: menos rolagem e tudo numa tela, pensando no computador.
+  - Aceite:
+    - Os cartões viram uma planilha com uma linha por setor: médicos (− e +), pacientes, cardio/geri, potenciais admissões, carga por médico, diferença para a média e a situação em célula colorida, sem apoio e com a recomendação.
+    - Topo numa faixa: tipo de dia, subir relatório (botão ou arrastar para a página), preencher à mão, editar contagens e imprimir; média, totais e legenda numa linha.
+    - A recomendação de apoio fica embaixo, enxuta, em frases editáveis no lugar. Ela já vale na coluna "Com apoio" e na folha, sem o passo de aceitar e sem o seletor Antes/Depois.
+    - No celular, as colunas secundárias somem, a coluna do setor fica fixa e um quadradinho da cor vai ao lado do nome.

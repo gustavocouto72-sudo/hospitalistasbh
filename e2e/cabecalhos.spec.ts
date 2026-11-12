@@ -26,7 +26,7 @@ test('a CSP de produção chega ao navegador e não bloqueia o site', async ({ p
   await page.getByRole('button', { name: textos.subir.escolher }).click();
   await (await seletor).setFiles(FIXTURE);
   await expect(page.getByText(/postos lidos\./)).toBeVisible();
-  await expect(page.locator('article[data-setor]').first()).toBeVisible();
+  await expect(page.locator('li[data-apoio]').first()).toBeVisible();
 
   expect(violacoes).toEqual([]);
 });

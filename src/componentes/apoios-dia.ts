@@ -9,28 +9,26 @@
  * mais com os apoios decididos. Os decididos ficam até a equipe mexer neles; se uma edição do quadro os torna
  * inválidos, eles continuam na lista com a mensagem do cálculo e ficam fora do Depois.
  *
- * O Depois aplica só os apoios aceitos e válidos. Fica tudo na memória: recarregar a página zera.
+ * A coluna "Com apoio" da planilha e a folha aplicam todos os apoios válidos da lista, sugeridos ou decididos:
+ * a recomendação já vale, e a equipe só edita ou remove. Fica tudo na memória: recarregar a página zera.
  */
 import { aplicarApoios } from '@/calculo/aplicar-apoios';
 import { sugerirApoios, type SugestaoDeApoio } from '@/calculo/sugerir-apoios';
 import type { Apoio, Painel, SetorNoPainel } from '@/calculo/tipos';
 import { textos } from '@/textos';
 
-export type Vista = 'antes' | 'depois';
-
 export type EstadoApoios = {
   /** Apoios que a equipe aceitou, editou ou adicionou. Um por par (apoiador, apoiado). */
   readonly decididos: readonly Apoio[];
   /** Pares da sugestão que a equipe removeu ou trocou, para não voltarem. Chave de `chaveDoPar`. */
   readonly descartados: readonly string[];
-  readonly vista: Vista;
 };
 
-export const APOIOS_INICIAL: EstadoApoios = { decididos: [], descartados: [], vista: 'antes' };
+export const APOIOS_INICIAL: EstadoApoios = { decididos: [], descartados: [] };
 
 export type ItemDaLista = {
   readonly apoio: Apoio;
-  /** `sugerido`: ainda não aceito. `aceito`: decidido pela equipe e, se válido, entra no Depois. */
+  /** `sugerido`: saiu da sugestão do dia. `aceito`: decidido pela equipe (editado, trocado ou adicionado). */
   readonly origem: 'sugerido' | 'aceito';
   /** Mensagem do cálculo quando o apoio aceito não vale com o quadro atual; senão `null`. */
   readonly erro: string | null;
@@ -85,14 +83,14 @@ export function listaDeApoios(painel: Painel, sugeridos: readonly Apoio[], estad
   return ordenarPeloQuadro(painel, itens);
 }
 
-/** Os apoios que entram no Depois: aceitos e válidos. */
-export function apoiosAceitos(lista: readonly ItemDaLista[]): Apoio[] {
-  return lista.filter((i) => i.origem === 'aceito' && i.erro === null).map((i) => i.apoio);
+/** Os apoios que valem: todos os da lista sem erro, sugeridos ou decididos. */
+export function apoiosEmVigor(lista: readonly ItemDaLista[]): Apoio[] {
+  return lista.filter((i) => i.erro === null).map((i) => i.apoio);
 }
 
-/** O painel que os cartões e o resumo mostram: sem apoio (Antes) ou com os apoios aceitos (Depois). */
-export function painelDaVista(painel: Painel, lista: readonly ItemDaLista[], vista: Vista): Painel {
-  return vista === 'antes' ? painel : aplicarApoios(painel, apoiosAceitos(lista));
+/** O painel com os apoios em vigor aplicados. */
+export function painelComApoio(painel: Painel, lista: readonly ItemDaLista[]): Painel {
+  return aplicarApoios(painel, apoiosEmVigor(lista));
 }
 
 /** Guarda o apoio entre os decididos, trocando o do mesmo par, se houver. */
@@ -136,10 +134,6 @@ export function removerApoio(estado: EstadoApoios, apoio: Apoio): EstadoApoios {
 export function adicionarApoio(estado: EstadoApoios, apoio: Apoio): EstadoApoios {
   const existente = estado.decididos.find((d) => mesmoPar(d, apoio));
   return decidir(estado, existente ? { ...apoio, leitos: existente.leitos + apoio.leitos } : apoio);
-}
-
-export function escolherVista(estado: EstadoApoios, vista: Vista): EstadoApoios {
-  return estado.vista === vista ? estado : { ...estado, vista };
 }
 
 /** Setores que podem apoiar `para`: têm médico, não são escala própria e não são o próprio apoiado. */

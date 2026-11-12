@@ -1,6 +1,6 @@
 /**
  * Folha de impressão da SPEC-06 com a fixture sintética da amostra: em `@media print` os controles somem, a
- * folha mostra cabeçalho, tabela, apoios aceitos e rodapé, e o PDF em A4 sai com uma página só.
+ * folha mostra cabeçalho, tabela, apoios da recomendação e rodapé, e o PDF em A4 sai com uma página só.
  */
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -15,22 +15,21 @@ test.beforeEach(async ({ page }) => {
   await page.clock.setFixedTime(new Date('2026-11-12T09:00:00-03:00'));
 });
 
-async function subirEAceitarTudo(page: Page) {
+async function subirRelatorio(page: Page) {
   await page.goto('/');
   const seletor = page.waitForEvent('filechooser');
   await page.getByRole('button', { name: textos.subir.escolher }).click();
   await (await seletor).setFiles(FIXTURE);
   await expect(page.getByText(/postos lidos\./)).toBeVisible();
-  // Aceita todas as sugestões, o caso mais longo da folha.
-  const aceitar = page.getByRole('button', { name: /^Aceitar: / });
-  while ((await aceitar.count()) > 0) await aceitar.first().click();
+  // A recomendação já vale e vai inteira para a folha.
+  await expect(page.locator('li[data-apoio]').first()).toBeVisible();
 }
 
 /** Páginas de um PDF do Chromium: os objetos `/Type /Page`, sem contar o `/Pages` da árvore. */
 const paginas = (pdf: Buffer) => pdf.toString('latin1').match(/\/Type\s*\/Page(?![a-z])/g)?.length ?? 0;
 
 test('na impressão, só a folha aparece, sem controles', async ({ page }) => {
-  await subirEAceitarTudo(page);
+  await subirRelatorio(page);
   const folha = page.locator('section[data-folha]');
   await expect(folha).toBeHidden();
 
@@ -57,7 +56,7 @@ test('o botão "Imprimir ou gerar PDF" chama window.print()', async ({ page }) =
       contagem.vezes++;
     };
   });
-  await subirEAceitarTudo(page);
+  await subirRelatorio(page);
   await page.getByRole('button', { name: textos.imprimir.botao }).click();
   expect(await page.evaluate(() => (window as unknown as { __impressoes: { vezes: number } }).__impressoes.vezes)).toBe(
     1,
@@ -65,7 +64,7 @@ test('o botão "Imprimir ou gerar PDF" chama window.print()', async ({ page }) =
 });
 
 test('com a amostra, o PDF em A4 tem 1 página e os textos-chave', async ({ page }, info) => {
-  await subirEAceitarTudo(page);
+  await subirRelatorio(page);
   await page.emulateMedia({ media: 'print' });
   const folha = page.locator('section[data-folha]');
   const pdf = await page.pdf({ format: 'A4', preferCSSPageSize: true, printBackground: true });

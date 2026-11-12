@@ -1,11 +1,11 @@
 /**
- * Conteúdo da folha de impressão (SPEC-06). Puro: a folha mostra sempre o antes e o depois dos apoios
- * aceitos, seja qual for a vista da tela, e deixa de fora as sugestões que não foram aceitas.
+ * Conteúdo da folha de impressão (SPEC-06). Puro: a folha mostra o antes e o depois dos apoios em vigor,
+ * os mesmos da coluna "Com apoio" da planilha.
  */
 import { aplicarApoios } from '@/calculo/aplicar-apoios';
 import type { Painel, SetorNoPainel } from '@/calculo/tipos';
 import { textos } from '@/textos';
-import { apoiosAceitos, nomeDoSetor, type ItemDaLista } from './apoios-dia';
+import { apoiosEmVigor, nomeDoSetor, type ItemDaLista } from './apoios-dia';
 import { visualDoSetor, type VisualDoSetor } from './painel-dia';
 
 export type LinhaDaFolha = {
@@ -14,16 +14,16 @@ export type LinhaDaFolha = {
   readonly postos: string;
   readonly medicos: string;
   readonly pacientes: string;
-  /** Pacientes por médico sem apoio e com os apoios aceitos. */
+  /** Pacientes por médico sem apoio e com os apoios em vigor. */
   readonly antes: string;
   readonly depois: string;
-  /** Cor e rótulo do setor depois dos apoios aceitos. */
+  /** Cor e rótulo do setor com os apoios em vigor. */
   readonly visual: VisualDoSetor;
 };
 
 export type FolhaDoDia = {
   readonly linhas: readonly LinhaDaFolha[];
-  /** Apoios aceitos, em frases ("4.5 apoia 3 leitos do 4.3."). */
+  /** Apoios em vigor, em frases ("4.5 apoia 3 leitos do 4.3."). */
   readonly apoios: readonly string[];
   readonly media: string;
   readonly medicos: string;
@@ -39,8 +39,8 @@ function porMedico(setor: Pick<SetorNoPainel, 'estado' | 'cargaPorMedico'>): str
 }
 
 export function folhaDoDia(painel: Painel, lista: readonly ItemDaLista[]): FolhaDoDia {
-  const aceitos = apoiosAceitos(lista);
-  const depois = aplicarApoios(painel, aceitos);
+  const emVigor = apoiosEmVigor(lista);
+  const depois = aplicarApoios(painel, emVigor);
   const linhas = depois.setores.map((setor): LinhaDaFolha => ({
     id: setor.id,
     nome: setor.nome,
@@ -51,7 +51,7 @@ export function folhaDoDia(painel: Painel, lista: readonly ItemDaLista[]): Folha
     depois: porMedico(setor),
     visual: visualDoSetor(setor),
   }));
-  const apoios = aceitos.map(
+  const apoios = emVigor.map(
     (apoio) =>
       `${textos.apoio.lista.frase({ de: nomeDoSetor(painel, apoio.de), para: nomeDoSetor(painel, apoio.para), leitos: apoio.leitos })}.`,
   );

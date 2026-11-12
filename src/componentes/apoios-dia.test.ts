@@ -7,13 +7,12 @@ import {
   adicionarApoio,
   apoiadoresPossiveis,
   apoiadosPossiveis,
-  apoiosAceitos,
+  apoiosEmVigor,
   editarLeitos,
   erroDoNovoApoio,
-  escolherVista,
   listaDeApoios,
   notasDeApoio,
-  painelDaVista,
+  painelComApoio,
   removerApoio,
   sugestaoDoDia,
   trocarApoiador,
@@ -52,7 +51,7 @@ describe('listaDeApoios', () => {
     const lista = listaDeApoios(painel, sugestao.apoios, APOIOS_INICIAL);
     expect(lista.map((i) => i.apoio)).toEqual(sugestao.apoios);
     expect(lista.every((i) => i.origem === 'sugerido' && i.erro === null)).toBe(true);
-    expect(apoiosAceitos(lista)).toEqual([]);
+    expect(apoiosEmVigor(lista)).toEqual(sugestao.apoios);
   });
 
   it('aceitar põe o apoio entre os aceitos, sem repetir na lista', () => {
@@ -61,14 +60,15 @@ describe('listaDeApoios', () => {
     const lista = listaDeApoios(painel, sugestao.apoios, estado);
     expect(lista).toHaveLength(sugestao.apoios.length);
     expect(lista.find((i) => i.apoio.de === primeiro.de && i.apoio.para === primeiro.para)?.origem).toBe('aceito');
-    expect(apoiosAceitos(lista)).toEqual([primeiro]);
+    expect(apoiosEmVigor(lista)).toContainEqual(primeiro);
   });
 
   it('editar os leitos de uma sugestão aceita o apoio com os leitos novos', () => {
     const [primeiro] = sugestao.apoios as [Apoio];
     const estado = editarLeitos(APOIOS_INICIAL, primeiro, primeiro.leitos + 1);
     const lista = listaDeApoios(painel, sugestao.apoios, estado);
-    expect(apoiosAceitos(lista)).toEqual([{ ...primeiro, leitos: primeiro.leitos + 1 }]);
+    expect(apoiosEmVigor(lista)).toContainEqual({ ...primeiro, leitos: primeiro.leitos + 1 });
+    expect(apoiosEmVigor(lista)).not.toContainEqual(primeiro);
     expect(lista).toHaveLength(sugestao.apoios.length);
   });
 
@@ -93,7 +93,7 @@ describe('listaDeApoios', () => {
     const estado = trocarApoiador(APOIOS_INICIAL, primeiro, outro!.id);
     const lista = listaDeApoios(painel, sugestao.apoios, estado);
     expect(lista.some((i) => i.apoio.de === primeiro.de && i.apoio.para === primeiro.para)).toBe(false);
-    expect(apoiosAceitos(lista)).toEqual([{ ...primeiro, de: outro!.id }]);
+    expect(apoiosEmVigor(lista)).toContainEqual({ ...primeiro, de: outro!.id });
   });
 
   it('adicionar um apoio novo entra aceito; no mesmo par, soma os leitos', () => {
@@ -101,15 +101,15 @@ describe('listaDeApoios', () => {
     const dois = adicionarApoio(um, apoio('6.1', '4.3', 1));
     expect(dois.decididos).toEqual([apoio('6.1', '4.3', 3)]);
     const lista = listaDeApoios(painel, sugestao.apoios, dois);
-    expect(apoiosAceitos(lista)).toContainEqual(apoio('6.1', '4.3', 3));
+    expect(apoiosEmVigor(lista)).toContainEqual(apoio('6.1', '4.3', 3));
   });
 
-  it('marca o apoio aceito que ficou inválido, com a mensagem, e o deixa fora do Depois', () => {
+  it('marca o apoio decidido que ficou inválido, com a mensagem, e o deixa fora da conta', () => {
     const estado = adicionarApoio(APOIOS_INICIAL, apoio('4.5', '6.1', 50));
     const lista = listaDeApoios(painel, sugestao.apoios, estado);
     const item = lista.find((i) => i.apoio.para === '6.1' && i.apoio.de === '4.5');
     expect(item?.erro).toBe(textos.apoio.erros.cedeDemais({ setor: '6.1', cedidos: 50, carga: 9 }));
-    expect(apoiosAceitos(lista)).not.toContainEqual(apoio('4.5', '6.1', 50));
+    expect(apoiosEmVigor(lista)).not.toContainEqual(apoio('4.5', '6.1', 50));
   });
 
   it('esconde a sugestão que não combina com os apoios aceitos', () => {
@@ -157,21 +157,22 @@ describe('candidatos', () => {
   });
 });
 
-describe('Antes / Depois', () => {
-  it('Antes mostra o painel sem apoio; Depois aplica só os aceitos', () => {
-    const [primeiro] = sugestao.apoios as [Apoio];
-    const estado = aceitarApoio(APOIOS_INICIAL, primeiro);
-    const lista = listaDeApoios(painel, sugestao.apoios, estado);
-
-    expect(painelDaVista(painel, lista, 'antes')).toBe(painel);
-    const depois = painelDaVista(painel, lista, escolherVista(estado, 'depois').vista);
-    const apoiado = depois.setores.find((s) => s.id === primeiro.para)!;
-    const antes = painel.setores.find((s) => s.id === primeiro.para)!;
-    expect(apoiado.carga).toBe(antes.carga - primeiro.leitos);
+describe('painelComApoio', () => {
+  it('aplica todos os apoios válidos da lista, sugeridos ou decididos', () => {
+    const lista = listaDeApoios(painel, sugestao.apoios, APOIOS_INICIAL);
+    const com = painelComApoio(painel, lista);
+    for (const para of new Set(sugestao.apoios.map((a) => a.para))) {
+      const cedidos = sugestao.apoios.filter((a) => a.para === para).reduce((soma, a) => soma + a.leitos, 0);
+      const antes = painel.setores.find((s) => s.id === para)!;
+      const depois = com.setores.find((s) => s.id === para)!;
+      expect(depois.carga).toBe(antes.carga - cedidos);
+    }
   });
 
-  it('começa em Antes', () => {
-    expect(APOIOS_INICIAL.vista).toBe('antes');
+  it('sem apoios na lista, as cargas não mudam', () => {
+    const removidos = sugestao.apoios.reduce((estado, a) => removerApoio(estado, a), APOIOS_INICIAL);
+    const com = painelComApoio(painel, listaDeApoios(painel, sugestao.apoios, removidos));
+    expect(com.setores.map((s) => s.carga)).toEqual(painel.setores.map((s) => s.carga));
   });
 });
 

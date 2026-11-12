@@ -62,13 +62,17 @@ for (const fixture of FIXTURES) {
     });
     await subir(page, fixture);
 
-    // Todo o uso depois da subida: editar médicos, aceitar apoios, alternar a vista e imprimir.
-    const cartao = page.locator('article[data-setor="4.3"]');
-    await cartao.getByRole('button', { name: textos.cartao.maisMedico('4.3') }).click();
-    await cartao.getByRole('button', { name: textos.cartao.menosMedico('4.3') }).click();
-    const aceitar = page.getByRole('button', { name: /^Aceitar: / });
-    while ((await aceitar.count()) > 0) await aceitar.first().click();
-    await page.getByText(textos.apoio.lista.vista.depois, { exact: true }).click();
+    // Todo o uso depois da subida: editar médicos e contagens, mexer num apoio e imprimir.
+    const linha = page.locator('main tr[data-setor="4.3"]');
+    await linha.getByRole('button', { name: textos.cartao.maisMedico('4.3') }).click();
+    await linha.getByRole('button', { name: textos.cartao.menosMedico('4.3') }).click();
+    await page.getByRole('button', { name: textos.planilha.editar }).click();
+    await page.getByRole('textbox', { name: textos.cartao.campo.hospitalistas('4.3') }).fill('24');
+    await page.getByRole('button', { name: textos.planilha.pronto }).click();
+    await page
+      .getByRole('button', { name: /^Pôr um leito: / })
+      .first()
+      .click();
     await page.getByRole('button', { name: textos.imprimir.botao }).click();
     await page.waitForLoadState('networkidle');
 

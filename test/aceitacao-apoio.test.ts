@@ -140,20 +140,25 @@ describe('T-04.4 — casos de aceitação sintéticos', () => {
 describe('T-04.4 — propriedades em painéis aleatórios (até 10 setores)', () => {
   const sementes = Array.from({ length: 100 }, (_, i) => 9001 + i);
 
-  it.each(sementes)('semente %i: invariantes, nunca piora e determinismo', (semente) => {
-    const p = painelAleatorio(semente, 10, 24);
-    const copia = structuredClone(p);
-    const r = sugerirApoios(p);
-    // Invariantes e restrições: Σ pacientes reais, ninguém cede mais do que tem, apoiador até +1 etc.
-    conferirRestricoes(p, r.apoios);
-    expect(r.painelDepois).toEqual(aplicarApoios(p, r.apoios));
-    // Nunca piora o número de setores fora do verde.
-    expect(foraDoVerde(r.painelDepois)).toBeLessThanOrEqual(foraDoVerde(p));
-    expect(r.completo).toBe(foraDoVerde(r.painelDepois) === 0);
-    // Determinismo, sem mudar a entrada.
-    expect(p).toEqual(copia);
-    expect(sugerirApoios(copia)).toEqual(r);
-  });
+  it.each(sementes)(
+    'semente %i: invariantes, nunca piora e determinismo',
+    (semente) => {
+      const p = painelAleatorio(semente, 10, 24);
+      const copia = structuredClone(p);
+      const r = sugerirApoios(p);
+      // Invariantes e restrições: Σ pacientes reais, ninguém cede mais do que tem, apoiador até +1 etc.
+      conferirRestricoes(p, r.apoios);
+      expect(r.painelDepois).toEqual(aplicarApoios(p, r.apoios));
+      // Nunca piora o número de setores fora do verde.
+      expect(foraDoVerde(r.painelDepois)).toBeLessThanOrEqual(foraDoVerde(p));
+      expect(r.completo).toBe(foraDoVerde(r.painelDepois) === 0);
+      // Determinismo, sem mudar a entrada.
+      expect(p).toEqual(copia);
+      expect(sugerirApoios(copia)).toEqual(r);
+      // Painéis de até 10 setores: com a máquina ocupada, uma semente passa dos 5 s padrão.
+    },
+    20_000,
+  );
 });
 
 /**

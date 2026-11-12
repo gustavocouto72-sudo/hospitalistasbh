@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'reac
 import { flushSync } from 'react-dom';
 import { chaveDoDia, dataDaChave, tipoDiaPadrao } from '@/calculo/tipo-dia';
 import type { TipoDia } from '@/calculo/tipos';
-import { textos } from '@/textos';
 import {
   ENTRADA_INICIAL,
   concluirLeitura,
@@ -14,36 +13,23 @@ import {
   postosDaFonte,
   preencherAMao,
 } from './entrada';
-import {
-  ESTADO_INICIAL,
-  ajustarContagem,
-  ajustarMedicos,
-  escolherTipoDia,
-  quadroDoDia,
-  tipoDiaAtual,
-} from './estado-dia';
+import { ESTADO_INICIAL, ajustarContagem, ajustarMedicos, escolherTipoDia, tipoDiaAtual } from './estado-dia';
 import {
   APOIOS_INICIAL,
-  aceitarApoio,
   adicionarApoio,
-  apoiosAceitos,
+  apoiosEmVigor,
   editarLeitos,
-  escolherVista,
   listaDeApoios,
-  painelDaVista,
+  painelComApoio,
   removerApoio,
   sugestaoDoDia,
   trocarApoiador,
 } from './apoios-dia';
-import { BotaoImprimir } from './BotaoImprimir';
+import { Cabecalho } from './Cabecalho';
 import { FolhaImpressao } from './FolhaImpressao';
-import { ListaApoios } from './ListaApoios';
 import { painelDoDia } from './painel-dia';
-import { QuadroPadrao } from './QuadroPadrao';
-import { QuadroSetores } from './QuadroSetores';
-import { ResumoDia } from './ResumoDia';
-import { SubirRelatorio } from './SubirRelatorio';
-import { Topo } from './Topo';
+import { Planilha } from './Planilha';
+import { Recomendacao } from './Recomendacao';
 
 // O site é estático: o dia de hoje só existe no aparelho. No HTML gerado no build ele é `null`, e o React
 // troca pelo dia local logo ao abrir a página, sem erro de hidratação. O dia fica fixo enquanto a página está
@@ -73,12 +59,13 @@ export function Pagina() {
 
   const [estado, setEstado] = useState(ESTADO_INICIAL);
   const tipoDia = tipoDiaAtual(estado, padrao);
-  const quadro = quadroDoDia(tipoDia);
 
   // A fonte das contagens: o relatório subido ou o preenchimento à mão.
   const [entrada, setEntrada] = useState(ENTRADA_INICIAL);
-  // Apoios aceitos, editados e adicionados, e a vista Antes/Depois. Valem para o quadro e a fonte em uso.
+  // Apoios editados, trocados, removidos e adicionados. Valem para o quadro e a fonte em uso.
   const [apoios, setApoios] = useState(APOIOS_INICIAL);
+  // Campos de contagem por posto abertos na planilha. No preenchimento à mão, abrem sozinhos.
+  const [editando, setEditando] = useState(false);
   // Só a última leitura pedida vale: um arquivo lento não sobrescreve outro escolhido depois.
   const ultimaLeitura = useRef(0);
 
@@ -91,6 +78,7 @@ export function Pagina() {
     if (resultado.tipo === 'relatorio') {
       setEstado(descartarContagens);
       setApoios(APOIOS_INICIAL);
+      setEditando(false);
     }
   }
 
@@ -99,6 +87,7 @@ export function Pagina() {
     setEntrada(preencherAMao());
     setEstado(descartarContagens);
     setApoios(APOIOS_INICIAL);
+    setEditando(true);
   }
 
   function trocarTipoDia(tipo: TipoDia) {
@@ -108,56 +97,51 @@ export function Pagina() {
     setApoios(APOIOS_INICIAL);
   }
 
-  // Os números se refazem a cada edição, sem botão "calcular".
+  // Os números se refazem a cada edição, sem botão "calcular". Antes do relatório, a planilha mostra o quadro
+  // de médicos com as contagens vazias.
   const { fonte } = entrada;
   const { ajustes } = estado;
+  const temDados = fonte.tipo !== 'nenhuma';
+  const postos = postosDaFonte(fonte);
   const painel = useMemo(
-    () => (tipoDia && fonte.tipo !== 'nenhuma' ? painelDoDia(postosDaFonte(fonte), tipoDia, ajustes) : null),
+    () => (tipoDia ? painelDoDia(postosDaFonte(fonte), tipoDia, ajustes) : null),
     [fonte, tipoDia, ajustes],
   );
-  const sugestao = useMemo(() => (painel ? sugestaoDoDia(painel) : null), [painel]);
-  const postos = postosDaFonte(fonte);
+  const sugestao = useMemo(() => (painel && temDados ? sugestaoDoDia(painel) : null), [painel, temDados]);
   const lista = painel && sugestao ? listaDeApoios(painel, sugestao.apoios, apoios) : [];
-  const vistaPainel = painel ? painelDaVista(painel, lista, apoios.vista) : null;
-  const aplicados = apoios.vista === 'depois' ? apoiosAceitos(lista) : [];
+  const comApoio = painel ? painelComApoio(painel, lista) : null;
+  const emVigor = apoiosEmVigor(lista);
 
-  const imprimivel = painel && tipoDia && geradaEm && fonte.tipo !== 'nenhuma';
+  const imprimivel = painel && tipoDia && geradaEm && temDados;
 
   return (
     <>
       <main
-        className={`mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 pt-6 pb-12 sm:px-8 ${imprimivel ? 'print:hidden' : ''}`}
+        className={`mx-auto flex w-full max-w-[90rem] flex-col gap-4 px-4 pt-5 pb-10 sm:px-6 lg:px-8 ${imprimivel ? 'print:hidden' : ''}`}
       >
-        <Topo hoje={hoje} tipoDia={tipoDia} aoEscolher={trocarTipoDia} />
-        <SubirRelatorio entrada={entrada} aoEscolherArquivo={escolherArquivo} aoPreencherAMao={abrirAMao} />
-        {painel && sugestao && vistaPainel && fonte.tipo !== 'nenhuma' ? (
+        <Cabecalho
+          hoje={hoje}
+          tipoDia={tipoDia}
+          entrada={entrada}
+          painel={temDados ? painel : null}
+          editando={editando}
+          podeImprimir={Boolean(imprimivel)}
+          aoEscolherTipoDia={trocarTipoDia}
+          aoEscolherArquivo={escolherArquivo}
+          aoPreencherAMao={abrirAMao}
+          aoAlternarEdicao={() => setEditando((atual) => !atual)}
+        />
+        {painel && comApoio ? (
           <>
-            <ResumoDia painel={vistaPainel} />
-            <ListaApoios
+            <Planilha
               painel={painel}
-              lista={lista}
-              completo={sugestao.completo}
-              aviso={sugestao.aviso}
-              vista={apoios.vista}
-              aoAceitar={(apoio) => setApoios((atual) => aceitarApoio(atual, apoio))}
-              aoEditarLeitos={(apoio, leitos) => setApoios((atual) => editarLeitos(atual, apoio, leitos))}
-              aoTrocarApoiador={(apoio, de) => setApoios((atual) => trocarApoiador(atual, apoio, de))}
-              aoRemover={(apoio) => setApoios((atual) => removerApoio(atual, apoio))}
-              aoAdicionar={(apoio) => setApoios((atual) => adicionarApoio(atual, apoio))}
-              aoEscolherVista={(vista) => setApoios((atual) => escolherVista(atual, vista))}
-            />
-            {imprimivel ? <BotaoImprimir /> : null}
-            <QuadroSetores
-              painel={vistaPainel}
+              comApoio={comApoio}
+              apoios={emVigor}
+              temDados={temDados}
+              editando={editando && temDados}
+              fonte={fonte.tipo}
               postos={postos}
               ajustes={ajustes}
-              fonte={fonte.tipo}
-              apoios={aplicados}
-              legenda={
-                apoios.vista === 'antes'
-                  ? textos.apoio.lista.vista.notaAntes
-                  : textos.apoio.lista.vista.notaDepois(aplicados.length)
-              }
               aoAjustarMedicos={(setor, semAjuste, sentido) =>
                 setEstado((atual) => ajustarMedicos(atual, setor, semAjuste, sentido))
               }
@@ -165,9 +149,18 @@ export function Pagina() {
                 setEstado((atual) => ajustarContagem(atual, posto, campo, valor))
               }
             />
+            <Recomendacao
+              painel={painel}
+              lista={lista}
+              temDados={temDados}
+              completo={sugestao?.completo ?? true}
+              aviso={sugestao?.aviso ?? null}
+              aoEditarLeitos={(apoio, leitos) => setApoios((atual) => editarLeitos(atual, apoio, leitos))}
+              aoTrocarApoiador={(apoio, de) => setApoios((atual) => trocarApoiador(atual, apoio, de))}
+              aoRemover={(apoio) => setApoios((atual) => removerApoio(atual, apoio))}
+              aoAdicionar={(apoio) => setApoios((atual) => adicionarApoio(atual, apoio))}
+            />
           </>
-        ) : quadro ? (
-          <QuadroPadrao quadro={quadro} />
         ) : null}
       </main>
       {imprimivel ? (

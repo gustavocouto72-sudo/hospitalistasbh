@@ -142,3 +142,12 @@ porque todo setor mostra número, rótulo e a régua de cinco casas.
 - Sem o dono no loop, a direção não passou pela página de decisão da skill. Se ele preferir outro mundo, como o
   quadro branco de passagem de plantão, que era a primeira da lista, basta uma nova rodada.
 - Só tema claro nesta versão.
+
+## Revisão do dono (12/11/2026): planilha única
+
+O dono achou os cartões difíceis de ler e pediu tudo numa tela, como planilha, com uso principal no
+computador. A direção continua a mesma (papel, tinta, cor só no semáforo), mas o gesto da régua de cinco casas
+sai da tela e fica só na folha impressa. Na tela, a situação de cada setor é uma **célula cheia na cor do
+semáforo, com o rótulo escrito**, como a formatação condicional de uma planilha. Colunas "Sem apoio" e "Com a
+recomendação" lado a lado, como as colunas de antes e depois do HelmCare. Linhas compactas (controles de 28 px
+no mouse, 40 px no toque) para os nove setores e a recomendação caberem em 1366 × 768 sem rolar.
