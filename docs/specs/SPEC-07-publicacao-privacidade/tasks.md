@@ -6,7 +6,7 @@
     - `vercel.json` com os cabeçalhos da spec.
     - Teste que confere a CSP.
 
-- [ ] **T-07.2 — Teste de não-envio**
+- [x] **T-07.2 — Teste de não-envio**
   - Depende de: T-07.1, T-05.3
   - Aceite:
     - Playwright falha se, depois de subir a fixture, houver requisição para outra origem.

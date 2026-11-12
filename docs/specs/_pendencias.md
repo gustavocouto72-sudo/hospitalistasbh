@@ -370,3 +370,7 @@ para a nota A do securityheaders.com.
 
 - CSP usa 'unsafe-inline' em script-src e style-src (decisão registrada em _pendencias.md; pode virar hashes no build) (vercel.json)
 - Servidor estático e teste só consideram a regra com source '/(.*)'; outras regras do vercel.json seriam ignoradas (scripts/servir-estatico.mjs)
+
+## T-07.2 (rodada 1)
+
+- Status da task ainda em [~]; a troca para [x] fica com o enxuto.mjs (docs/specs/SPEC-07-publicacao-privacidade/tasks.md)

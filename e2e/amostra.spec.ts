@@ -78,18 +78,7 @@ test('da amostra subida até a sugestão de apoio, editando e aceitando', async 
   expect(guardado).toBe(0);
 });
 
-test('nada sai do navegador ao ler a amostra', async ({ page }) => {
-  const externos: string[] = [];
-  const posts: string[] = [];
-  page.on('request', (pedido) => {
-    if (!pedido.url().startsWith('http://127.0.0.1:3010/')) externos.push(pedido.url());
-    if (pedido.method() !== 'GET') posts.push(pedido.url());
-  });
-  await subir(page);
-  await expect(page.locator('li[data-apoio]').first()).toBeVisible();
-  expect(externos).toEqual([]);
-  expect(posts).toEqual([]);
-});
+// O não-envio fica em nao-envio.spec.ts (T-07.2).
 
 test('o teclado alcança os botões − e + com rótulo', async ({ page }) => {
   await subir(page);
