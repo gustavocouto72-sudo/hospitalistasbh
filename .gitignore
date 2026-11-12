@@ -14,3 +14,6 @@ playwright-report/
 *.xlsx
 *.csv
 !test/fixtures/**
+
+# Gerado pelo Next.js
+next-env.d.ts

@@ -1,6 +1,6 @@
 # Tasks — SPEC-01 Fundação
 
-- [ ] **T-01.1 — Inicializar repositório e app**
+- [x] **T-01.1 — Inicializar repositório e app**
   - Depende de: —
   - Aceite:
     - `git init` feito.
