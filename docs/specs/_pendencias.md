@@ -233,3 +233,18 @@ O resultado (`PainelComApoios`) guarda os números de antes em `antes`, mais `le
 
 - Azuis contam como 'fora do verde' no critério 1; decisão pendente do dono (registrada em _pendencias.md), e a T-04.3 deve seguir a mesma regra (test/busca-exaustiva.ts)
 - Sem solução completa, o critério 3 (menos leitos) antes do 4 faz o setor vermelho ceder o mínimo de leitos, e não o máximo que o aliviaria; segue a spec e está documentado (docs/specs/_pendencias.md)
+
+## T-04.3 — setores azuis contam como fora do verde
+
+O critério 1 da spec ("minimizar o número de setores fora do verde") conta também os setores no azul. Quando
+não há solução toda no verde, isso pode levar a sugestão a gastar os leitos de apoio para trazer os apoiadores
+do azul ao verde, em vez de aliviar ao máximo o setor sobrecarregado. Exemplo sintético (média 10): A com 30
+pacientes e 1 médico, B e C com 10 e 2 cada. A sugestão é B e C apoiarem 7 leitos cada (A fica em 16, ainda
+vermelho, e B e C no verde), e não 9 cada (A em 12, amarelo). Segui a spec, que é o mesmo critério da busca
+exaustiva da T-04.2. Se o dono preferir aliviar primeiro quem está acima do verde, o critério 1 precisa mudar.
+
+## T-04.3 (rodada 1)
+
+- Setores azuis contam como fora do verde no critério 1; sem solução completa, isso favorece trazer apoiadores ao verde em vez de aliviar o sobrecarregado (decisão pendente do dono) (docs/specs/_pendencias.md)
+- Resultado exato da amostra de 12/11/2026 ainda não registrado no teste (aguarda conferência do dono) (src/calculo/sugerir-apoios.test.ts)
+- Teste da T-04.3 não compara a sugestão com a busca exaustiva de test/busca-exaustiva.ts em painéis pequenos; se outra task não cobrir, falta esse teste (src/calculo/sugerir-apoios.test.ts)

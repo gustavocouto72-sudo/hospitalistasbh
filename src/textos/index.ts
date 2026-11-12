@@ -62,5 +62,8 @@ export const textos = {
       cedeDemais: (d: { setor: string; cedidos: number; carga: number }) =>
         `O setor ${d.setor} cederia ${d.cedidos} leitos, mas tem só ${d.carga} pacientes.`,
     },
+    avisos: {
+      nemTodosNoVerde: 'Nem todos os setores cabem no verde hoje.',
+    },
   },
 } as const;

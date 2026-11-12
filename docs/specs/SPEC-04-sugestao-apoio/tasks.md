@@ -13,7 +13,7 @@
     - Busca até 3 apoios em painéis pequenos, seguindo os critérios lexicográficos da spec.
     - Fica em `test/`, fora do bundle.
 
-- [ ] **T-04.3 — sugerirApoios (guloso e melhoria local)**
+- [x] **T-04.3 — sugerirApoios (guloso e melhoria local)**
   - Depende de: T-04.1
   - Aceite:
     - Algoritmo determinístico.
