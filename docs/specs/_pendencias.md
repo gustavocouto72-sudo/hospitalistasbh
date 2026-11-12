@@ -164,3 +164,14 @@ basta tirar esse ramo e trocar a fixture por Latin-1.
 
 - Retorno nomeado QuadroMontado em vez de Quadro (diverge do texto da spec, decisão registrada em _pendencias.md) (src/calculo/tipos.ts)
 - Ausência do 4.1 no relatório sempre gera aviso de posto ausente, possível ruído no uso diário (src/calculo/montar-quadro.ts)
+
+## T-03.3 — Setor com 0 médicos e carga 0
+
+A spec define `semMedico` só para 0 médicos com carga > 0 e não diz o que fazer com 0 médicos e
+carga 0 (0 ÷ 0). Ficou um estado `vazio`: carga por médico e diferença `null`, fora do semáforo,
+sem pesar na média. Também ficou `null` a diferença de todos os setores quando a média é indefinida
+(Σ médicos = 0), e o painel traz o aviso `media-indefinida`. Ajustar se o dono preferir outra regra.
+
+## T-03.3 (rodada 1)
+
+- Estado 'vazio' (0 médicos e carga 0) não previsto na spec; decisão registrada em _pendencias.md e precisa de confirmação do dono (src/calculo/tipos.ts)

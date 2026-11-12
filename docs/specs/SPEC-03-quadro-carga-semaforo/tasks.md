@@ -16,7 +16,7 @@
     - Ajustes vencem o padrão.
     - Testes de borda verdes.
 
-- [ ] **T-03.3 — calcularCarga e média**
+- [x] **T-03.3 — calcularCarga e média**
   - Depende de: T-03.2
   - Aceite:
     - Carga, carga por médico, média e diferença.

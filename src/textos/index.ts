@@ -44,4 +44,10 @@ export const textos = {
         `O posto ${posto} está fora do quadro e veio com pacientes. Ele entrou como setor sem médico.`,
     },
   },
+  painel: {
+    avisos: {
+      mediaIndefinida:
+        'Nenhum setor tem médicos, então não há média do dia. Informe os médicos de cada setor para calcular a carga.',
+    },
+  },
 } as const;

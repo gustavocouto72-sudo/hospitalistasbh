@@ -75,3 +75,39 @@ export type QuadroMontado = {
   readonly postosOcultos: readonly string[];
   readonly avisos: readonly AvisoQuadro[];
 };
+
+/**
+ * Estado do setor no painel (SPEC-03, `calcularCarga`):
+ * - `calculado`: tem médicos; entra na média e no semáforo.
+ * - `escalaPropria`: aparece com as contagens, fora da média e sem cor.
+ * - `semMedico`: 0 médicos e carga > 0; entra na carga do dia, não soma médicos e fica vermelho.
+ * - `vazio`: 0 médicos e carga 0; nada a atender, fora do semáforo.
+ */
+export type EstadoSetor = 'calculado' | 'escalaPropria' | 'semMedico' | 'vazio';
+
+/** Setor com a carga do dia. As contas usam números exatos; o arredondamento é só na exibição. */
+export type SetorNoPainel = SetorMontado & {
+  readonly estado: EstadoSetor;
+  /** Σ `hospitalistas` dos postos do setor. */
+  readonly carga: number;
+  /** Carga ÷ médicos; `Infinity` em `semMedico` (para ordenar) e `null` em `escalaPropria` e `vazio`. */
+  readonly cargaPorMedico: number | null;
+  /** Carga por médico − média; `null` quando não há carga por médico ou a média é indefinida. */
+  readonly diferenca: number | null;
+};
+
+export type AvisoPainel = AvisoQuadro | { readonly tipo: 'media-indefinida'; readonly mensagem: string };
+
+/** Resultado de `calcularCarga`. */
+export type Painel = {
+  readonly tipoDia: TipoDia;
+  readonly setores: readonly SetorNoPainel[];
+  readonly postosOcultos: readonly string[];
+  /** Σ carga dos setores `calculado` (inclui os `semMedico`). */
+  readonly cargaTotal: number;
+  /** Σ médicos dos setores `calculado`. */
+  readonly medicosTotal: number;
+  /** cargaTotal ÷ medicosTotal; `null` quando não há médicos. */
+  readonly media: number | null;
+  readonly avisos: readonly AvisoPainel[];
+};
