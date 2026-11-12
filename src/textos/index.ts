@@ -1,5 +1,38 @@
+import type { MotivoContagemInvalida } from '../relatorio/numeros';
+
+const MOTIVO: Record<MotivoContagemInvalida, string> = {
+  vazio: 'está vazio',
+  texto: 'não é um número',
+  negativo: 'é negativo',
+  decimal: 'tem casas decimais, e a contagem precisa ser um número inteiro',
+};
+
 export const textos = {
   app: {
     titulo: 'Divisão de carga dos hospitalistas',
+  },
+  leitura: {
+    erros: {
+      semPostos: 'Relatório sem postos: o arquivo não traz nenhuma linha de posto para ler.',
+      colunaAusente: (coluna: string) => `Falta a coluna "${coluna}" no cabeçalho do relatório.`,
+      numeroInvalido: (d: {
+        linha: number;
+        posto: string;
+        coluna: string;
+        valor: string;
+        motivo: MotivoContagemInvalida;
+      }) =>
+        `Linha ${d.linha} (${d.posto}): o valor ${d.valor === '' ? 'da coluna' : `"${d.valor}" da coluna`} "${d.coluna}" ${MOTIVO[d.motivo]}.`,
+      postoDuplicado: (d: { codigo: string; linha: number; primeiraLinha: number }) =>
+        `Linha ${d.linha}: o posto ${d.codigo} já apareceu na linha ${d.primeiraLinha}. Vale só a primeira.`,
+      postoSemNome: (linha: number) => `Linha ${linha}: falta o nome do posto.`,
+      xlsxSobDemanda: 'A leitura de planilhas .xlsx ainda não está disponível. Envie o relatório exportado pelo TASY.',
+    },
+    avisos: {
+      postoForaDoPadrao: (posto: string) =>
+        `O nome "${posto}" não segue o padrão "Posto N - Aº PAV". O posto entrou com o nome original como código, que pode ser editado.`,
+      potenciaisMaior: (d: { codigo: string; potenciaisAdmissoes: number; hospitalistas: number }) =>
+        `Posto ${d.codigo}: ${d.potenciaisAdmissoes} potenciais admissões, mais que os ${d.hospitalistas} pacientes dos hospitalistas.`,
+    },
   },
 } as const;

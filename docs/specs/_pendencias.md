@@ -91,3 +91,21 @@ basta tirar esse ramo e trocar a fixture por Latin-1.
 - lerNumero aceita ponto decimal além da vírgula, indo um pouco além da spec (registrado em _pendencias.md) (src/relatorio/numeros.ts)
 - extrairCodigoPosto aceita o nome sem ordinal, indo um pouco além da spec (registrado em _pendencias.md) (src/relatorio/posto.ts)
 - lerContagem('-0') é aceita e devolve -0 (src/relatorio/numeros.ts)
+
+## T-02.4 — Decisões da validação
+
+- **Posto duplicado:** gera erro e só a primeira ocorrência entra nos postos; a repetida fica de fora.
+- **Linha com número inválido:** sai dos postos inteira (com um erro para cada célula inválida); se
+  nenhuma linha sobrar, também sai o erro "relatório sem postos".
+- **Linha sem nome do posto** (com números): erro na linha, caso que a spec não cita.
+- **Numeração das linhas:** conta só as linhas com conteúdo, com o cabeçalho na linha 1; uma linha em
+  branco no meio do arquivo desloca o número em relação ao editor de texto.
+- **xlsx:** `lerRelatorio` é síncrona e, até a T-02.5, devolve o erro `xlsx-sob-demanda`. A T-02.5
+  deve decidir se a função passa a ser assíncrona para carregar o SheetJS por `import()`.
+- **Dependência:** `zod` 4.6.7 entrou em `dependencies`, fixado.
+
+## T-02.4 (rodada 1)
+
+- Numeração das linhas ignora linhas em branco no meio do arquivo e pode divergir do editor (decisão registrada em _pendencias.md) (src/relatorio/ler.ts)
+- xlsx ainda devolve erro xlsx-sob-demanda; leitura real fica para a T-02.5 (src/relatorio/ler.ts)
+- textos/ importa tipo de relatorio/numeros, acoplando interface à leitura (só type import) (src/textos/index.ts)

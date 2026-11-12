@@ -22,7 +22,7 @@
     - Parser de números com vírgula, incluindo `,5`.
     - Teste de propriedade do código do posto.
 
-- [ ] **T-02.4 — Validação, avisos e erros**
+- [x] **T-02.4 — Validação, avisos e erros**
   - Depende de: T-02.3
   - Aceite:
     - Schema Zod de `ContagemPosto`.

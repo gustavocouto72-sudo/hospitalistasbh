@@ -27,6 +27,7 @@ describe('T-02.3 — contagens', () => {
     expect(lerContagem('24')).toEqual({ ok: true, valor: 24 });
     expect(lerContagem('0')).toEqual({ ok: true, valor: 0 });
     expect(lerContagem('3,0')).toEqual({ ok: true, valor: 3 });
+    expect(Object.is((lerContagem('-0') as { valor: number }).valor, 0)).toBe(true);
   });
 
   it('diz por que a contagem é inválida', () => {

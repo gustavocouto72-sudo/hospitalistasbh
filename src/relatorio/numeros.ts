@@ -23,5 +23,5 @@ export function lerContagem(texto: string): Contagem {
   if (valor === undefined) return { ok: false, motivo: 'texto' };
   if (valor < 0) return { ok: false, motivo: 'negativo' };
   if (!Number.isInteger(valor)) return { ok: false, motivo: 'decimal' };
-  return { ok: true, valor };
+  return { ok: true, valor: valor === 0 ? 0 : valor }; // `-0` vira 0
 }
