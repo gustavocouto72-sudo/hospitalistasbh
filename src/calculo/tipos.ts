@@ -27,3 +27,51 @@ export type Quadro = {
   readonly tipoDia: TipoDia;
   readonly setores: readonly Setor[];
 };
+
+/**
+ * Contagens de um posto que o cálculo usa. É um recorte de `ContagemPosto` da leitura (SPEC-02), para o
+ * cálculo não depender do formato do relatório.
+ */
+export type ContagemDoPosto = {
+  readonly codigo: string;
+  readonly hospitalistas: number;
+  readonly cardioGeriatria: number;
+  readonly potenciaisAdmissoes: number;
+};
+
+/** Contagens somadas de um ou mais postos. A carga é só `hospitalistas`; as outras são indicadores. */
+export type Contagens = {
+  readonly hospitalistas: number;
+  readonly cardioGeriatria: number;
+  readonly potenciaisAdmissoes: number;
+};
+
+/**
+ * Ajustes do dia, que vencem o quadro padrão e o relatório (SPEC-03, "Ajustes").
+ * - `medicos`: por id de setor, em passos de 0,5 e ≥ 0. Ids que não existem no quadro do dia são ignorados.
+ * - `contagens`: por código de posto, campo a campo. Um posto ausente no relatório passa a existir.
+ */
+export type Ajustes = {
+  readonly medicos?: Readonly<Record<string, number>>;
+  readonly contagens?: Readonly<Record<string, Partial<Contagens>>>;
+};
+
+/** Setor com as contagens do dia já somadas. */
+export type SetorMontado = Setor & {
+  readonly contagens: Contagens;
+  /** Postos do setor que não vieram no relatório nem foram digitados. */
+  readonly postosAusentes: readonly string[];
+};
+
+export type AvisoQuadro =
+  | { readonly tipo: 'posto-ausente'; readonly posto: string; readonly setor: string; readonly mensagem: string }
+  | { readonly tipo: 'posto-fora-do-quadro'; readonly posto: string; readonly mensagem: string };
+
+/** Resultado de `montarQuadro`: o quadro do dia com contagens, ajustes aplicados e avisos. */
+export type QuadroMontado = {
+  readonly tipoDia: TipoDia;
+  readonly setores: readonly SetorMontado[];
+  /** Postos fora do quadro e zerados, que não aparecem como setor. */
+  readonly postosOcultos: readonly string[];
+  readonly avisos: readonly AvisoQuadro[];
+};

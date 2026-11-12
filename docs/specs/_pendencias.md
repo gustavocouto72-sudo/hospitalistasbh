@@ -142,3 +142,25 @@ basta tirar esse ramo e trocar a fixture por Latin-1.
 
 - 3.1 da semana (escalaPropria) grava medicos: 0 onde a spec traz '—'; decisão registrada em _pendencias.md (src/config/quadros.ts)
 - Spec cita config/quadros.ts; arquivo criado em src/config/quadros.ts (src/config/quadros.ts)
+
+## T-03.2 — montarQuadro
+
+- **Nome do retorno:** a spec diz `montarQuadro(...) → Quadro`, mas `Quadro` já é o tipo do quadro
+  padrão (T-03.1). O retorno é `QuadroMontado`, com `setores` (cada um com `contagens` somadas e
+  `postosAusentes`), `postosOcultos` e `avisos`.
+- **Posto zerado:** é o que tem as três contagens em 0. Um posto fora do quadro só com cardiologia e
+  geriatria vira setor sem médico (com carga 0).
+- **Posto ausente:** todo posto do quadro que não vem no relatório gera aviso, inclusive o 4.1, que na
+  prática pode não vir. Se o aviso do 4.1 incomodar, basta isentá-lo.
+- **Ajustes inválidos** (médicos fora dos passos de 0,5 ou negativos; contagem não inteira ou negativa)
+  lançam `RangeError`: a tela é quem impede esses valores. Ajuste de médicos para um setor que não existe
+  no quadro do dia é ignorado.
+- **Contagem digitada** para um posto ausente faz o posto existir e tira o aviso; zerar à mão um posto
+  fora do quadro o esconde.
+- **Postos novos com pacientes** entram depois dos setores do quadro, na ordem do relatório, com id e
+  nome iguais ao código do posto.
+
+## T-03.2 (rodada 1)
+
+- Retorno nomeado QuadroMontado em vez de Quadro (diverge do texto da spec, decisão registrada em _pendencias.md) (src/calculo/tipos.ts)
+- Ausência do 4.1 no relatório sempre gera aviso de posto ausente, possível ruído no uso diário (src/calculo/montar-quadro.ts)

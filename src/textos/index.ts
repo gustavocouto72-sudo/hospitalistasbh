@@ -36,4 +36,12 @@ export const textos = {
         `Posto ${d.codigo}: ${d.potenciaisAdmissoes} potenciais admissões, mais que os ${d.hospitalistas} pacientes dos hospitalistas.`,
     },
   },
+  quadro: {
+    avisos: {
+      postoAusente: (d: { posto: string; setor: string }) =>
+        `O posto ${d.posto} não veio no relatório. O setor ${d.setor} ficou sem as contagens dele; digite-as se precisar.`,
+      postoForaDoQuadro: (posto: string) =>
+        `O posto ${posto} está fora do quadro e veio com pacientes. Ele entrou como setor sem médico.`,
+    },
+  },
 } as const;

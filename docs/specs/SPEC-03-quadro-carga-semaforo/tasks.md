@@ -7,7 +7,7 @@
     - `config/quadros.ts` com os dois quadros da spec.
     - Teste: Σ médicos = 18 na semana e 8 no fim de semana; nenhum posto repetido.
 
-- [ ] **T-03.2 — montarQuadro**
+- [x] **T-03.2 — montarQuadro**
   - Depende de: T-03.1
   - Aceite:
     - Soma por setor.
