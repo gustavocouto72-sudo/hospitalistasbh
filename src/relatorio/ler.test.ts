@@ -75,7 +75,7 @@ describe('T-02.4 — amostra sintética', () => {
       expect(resultado.postos[5]).toEqual({
         codigo: '4.2',
         nomeOriginal: 'Unidade de Internação Posto 2 - 4º PAV',
-        hospitalistas: 24,
+        hospitalistas: 28,
         cardioGeriatria: 5,
         potenciaisAdmissoes: 2,
       });

@@ -98,7 +98,7 @@ describe('T-02.1 — fixtures sintéticas', () => {
   it('o CSV com , põe entre aspas os números com vírgula decimal', () => {
     const csv = utf8(ler('relatorio-9998-virgula.csv'));
     expect(linhas(csv)[0]).toBe(CABECALHO.join(','));
-    expect(csv).toContain(`${AMOSTRA[0]?.nomeOriginal},18,3,2,`);
+    expect(csv).toContain(`${AMOSTRA[0]?.nomeOriginal},14,3,2,`);
     expect(csv).toMatch(/,",5"(,|\r?\n)/);
   });
 

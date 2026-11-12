@@ -20,7 +20,7 @@ const CABECALHO = [
   'Fator dia semana',
   'Fator fim semana',
 ];
-const PRIMEIRA = ['Unidade de Internação Posto 1 - 2º PAV', '18', '3', '2', '12', '36', '1,5', ',5'];
+const PRIMEIRA = ['Unidade de Internação Posto 1 - 2º PAV', '14', '3', '2', '9,33', '28', '1,5', ',5'];
 const TOTAL = ['Total', '180', '35', '15', '8,57', '18', '21', '10'];
 
 describe('T-02.2 — detecção de formato pelo conteúdo', () => {

@@ -179,3 +179,21 @@ sem pesar na média. Também ficou `null` a diferença de todos os setores quand
 ## T-03.4 (rodada 1)
 
 - Nome dos casos em it.each usa %d, que trunca valores com épsilon e deixa o rótulo ambíguo (src/calculo/semaforo.test.ts)
+
+## T-03.5 — Números por posto da fixture refeitos
+
+Os hospitalistas por posto inventados na T-02.1 não reproduziam a tabela de aceite da SPEC-03 (por
+exemplo, 4.3 tinha 19 em vez de 23). A tabela fixa quase todos os postos: 2º andar 27, 4.2 28 (com o 4.1
+zerado), 4.3 23, 4.4 20, 4.5 16, 6.1 12, 6.2 26 e 6.3 22, que somam 174; com o total de 180, o 3.1 fica
+com 6, o que bate com 3.1 + 6.1 = 18 no fim de semana. A tabela `LINHAS` de `test/fixtures/gerar.ts` foi
+trocada e as fixtures regeneradas. Continuam inventados: a divisão do 2º andar (2.1 = 14, 2.2 = 13),
+cardiologia e geriatria (total 35 mantido) e potenciais admissões. As fixtures de borda não mudaram.
+
+O fim de semana não tem tabela na spec: o teste fixa a média 180 ÷ 8 = 22,5 e as cores que a regra do
+semáforo dá (4.2, 2º andar e 6.2 vermelhos; 4.3 e 6.3 verdes; 4.4, 3.1 + 6.1 e 4.5 azul-escuros). Se o
+dono tiver a tabela real do fim de semana, vale conferir.
+
+## T-03.5 (rodada 1)
+
+- Cores do fim de semana derivadas da regra, sem tabela de referência na spec (pendência já registrada) (test/aceitacao-amostra.test.ts)
+- Números da fixture da T-02.1 alterados para servir ao aceite da SPEC-03; o acoplamento entre as specs está documentado em _pendencias.md (test/fixtures/gerar.ts)

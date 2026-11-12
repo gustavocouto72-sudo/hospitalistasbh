@@ -29,7 +29,7 @@
     - Cinco cores com as fronteiras da spec.
     - Testes de fronteira verdes.
 
-- [ ] **T-03.5 — Teste de aceitação com a amostra**
+- [x] **T-03.5 — Teste de aceitação com a amostra**
   - Depende de: T-03.4, T-02.4
   - Aceite:
     - Da fixture até o painel, a tabela da spec bate na semana e no fim de semana.

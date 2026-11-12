@@ -36,19 +36,22 @@ export const CABECALHO = [
 const nomeDoPosto = (andar: number, numero: number) => `Unidade de Internação Posto ${numero} - ${andar}º PAV`;
 
 // [andar, posto, hospitalistas, cardio e geriatria, potenciais admissões, fator semana, fator fim de semana]
+// Os hospitalistas por posto reproduzem a tabela de aceite da SPEC-03 (174 na semana, sem o 3.1; 3.1 + 6.1 = 18
+// no fim de semana) e somam 180. Cardiologia e geriatria, potenciais admissões e a divisão do 2º andar entre
+// 2.1 e 2.2 são inventados.
 const LINHAS: [number, number, number, number, number, number, number][] = [
-  [2, 1, 18, 3, 2, 1.5, 0.5],
-  [2, 2, 16, 4, 1, 1.5, 0.5],
+  [2, 1, 14, 3, 2, 1.5, 0.5],
+  [2, 2, 13, 4, 1, 1.5, 0.5],
   [2, 3, 0, 0, 0, 1, 0.5],
-  [3, 1, 12, 2, 3, 0, 0.5],
+  [3, 1, 6, 2, 3, 0, 0.5],
   [4, 1, 0, 0, 0, 2.5, 1],
-  [4, 2, 24, 5, 2, 2.5, 1],
-  [4, 3, 19, 3, 1, 2, 1],
+  [4, 2, 28, 5, 2, 2.5, 1],
+  [4, 3, 23, 3, 1, 2, 1],
   [4, 4, 20, 4, 0, 2, 1],
-  [4, 5, 21, 3, 2, 2, 1],
-  [6, 1, 14, 2, 1, 2, 1],
-  [6, 2, 18, 5, 2, 2, 1],
-  [6, 3, 18, 4, 1, 2, 1],
+  [4, 5, 16, 3, 2, 2, 1],
+  [6, 1, 12, 2, 1, 2, 1],
+  [6, 2, 26, 5, 2, 2, 1],
+  [6, 3, 22, 4, 1, 2, 1],
 ];
 
 export const AMOSTRA: PostoDaAmostra[] = LINHAS.map(([andar, numero, hosp, cardio, pot, fs, ffs]) => ({
