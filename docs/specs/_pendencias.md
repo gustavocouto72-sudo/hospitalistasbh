@@ -248,3 +248,7 @@ exaustiva da T-04.2. Se o dono preferir aliviar primeiro quem está acima do ver
 - Setores azuis contam como fora do verde no critério 1; sem solução completa, isso favorece trazer apoiadores ao verde em vez de aliviar o sobrecarregado (decisão pendente do dono) (docs/specs/_pendencias.md)
 - Resultado exato da amostra de 12/11/2026 ainda não registrado no teste (aguarda conferência do dono) (src/calculo/sugerir-apoios.test.ts)
 - Teste da T-04.3 não compara a sugestão com a busca exaustiva de test/busca-exaustiva.ts em painéis pequenos; se outra task não cobrir, falta esse teste (src/calculo/sugerir-apoios.test.ts)
+
+## T-04.4 (rodada 1)
+
+- Uma das 8 divergências (semente 5254) perde no critério foraDoVerde com o guloso limitado a 3 apoios; sem o limite ele não fica atrás. Está registrada e dentro da tolerância de 5%. (test/aceitacao-apoio.test.ts)

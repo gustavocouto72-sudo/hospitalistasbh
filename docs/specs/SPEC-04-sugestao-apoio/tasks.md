@@ -20,7 +20,7 @@
     - Restrições da spec respeitadas.
     - `completo: false` quando não houver solução toda no verde.
 
-- [ ] **T-04.4 — Casos de aceitação e propriedades**
+- [x] **T-04.4 — Casos de aceitação e propriedades**
   - Depende de: T-04.2, T-04.3, T-03.5
   - Aceite:
     - Casos da spec verdes.
