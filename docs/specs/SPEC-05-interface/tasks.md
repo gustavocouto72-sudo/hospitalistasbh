@@ -29,7 +29,7 @@
     - Cartão "Escala própria" do 3.1 e postos ocultos recolhíveis.
     - Resumo do dia.
 
-- [ ] **T-05.5 — Lista de apoios com edição**
+- [x] **T-05.5 — Lista de apoios com edição**
   - Depende de: T-05.4, T-04.4
   - Aceite:
     - Aceitar, editar, trocar, remover e adicionar apoio.

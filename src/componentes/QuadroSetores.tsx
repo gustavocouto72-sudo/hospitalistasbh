@@ -1,6 +1,7 @@
 import { useId } from 'react';
-import type { Ajustes, ContagemDoPosto, Contagens, Painel } from '@/calculo/tipos';
+import type { Ajustes, Apoio, ContagemDoPosto, Contagens, Painel } from '@/calculo/tipos';
 import { textos } from '@/textos';
+import { notasDeApoio } from './apoios-dia';
 import { CartaoSetor } from './CartaoSetor';
 import { notasDoSetor, visualDoSetor } from './painel-dia';
 
@@ -11,6 +12,10 @@ type PropsQuadro = {
   readonly postos: readonly ContagemDoPosto[];
   readonly ajustes: Ajustes;
   readonly fonte: 'relatorio' | 'manual';
+  /** Apoios aplicados no painel (no Depois), para as notas dos cartões. Vazio no Antes. */
+  readonly apoios?: readonly Apoio[];
+  /** Linha sob o título que diz se os cartões estão no Antes ou no Depois. */
+  readonly legenda?: string;
   readonly aoAjustarMedicos: (setor: string, semAjuste: number, sentido: 1 | -1) => void;
   readonly aoAjustarContagem: (posto: string, campo: keyof Contagens, valor: number) => void;
 };
@@ -19,20 +24,22 @@ type PropsQuadro = {
  * Quadro de setores (SPEC-05, item 3): um cartão por setor, na ordem fixa do quadro, e os postos ocultos numa
  * linha recolhível. Uma coluna no celular, grade no desktop.
  */
-export function QuadroSetores({ painel, postos, ajustes, fonte, aoAjustarMedicos, aoAjustarContagem }: PropsQuadro) {
+export function QuadroSetores(props: PropsQuadro) {
+  const { painel, postos, ajustes, fonte, apoios = [], legenda, aoAjustarMedicos, aoAjustarContagem } = props;
   const titulo = useId();
   return (
     <section aria-labelledby={titulo} className="flex flex-col gap-3">
       <h2 id={titulo} className="text-titulo font-semibold">
         {t.titulo}
       </h2>
+      {legenda ? <p className="-mt-2 text-rotulo text-tinta-suave">{legenda}</p> : null}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-[repeat(auto-fill,minmax(18rem,1fr))]">
         {painel.setores.map((setor) => (
           <CartaoSetor
             key={setor.id}
             setor={setor}
             visual={visualDoSetor(setor)}
-            notas={notasDoSetor(painel, setor, fonte)}
+            notas={[...notasDoSetor(painel, setor, fonte), ...notasDeApoio(painel, apoios, setor.id)]}
             postos={postos}
             ajustes={ajustes}
             aoAjustarMedicos={aoAjustarMedicos}

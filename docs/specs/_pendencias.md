@@ -295,3 +295,22 @@ o `DESIGN.md` ao fim do loop. Também ficou de fora o modo escuro: só há tema 
 
 - Condição fonte.tipo !== 'nenhuma' repetida no cálculo de painel e no JSX (src/componentes/Pagina.tsx)
 - contagensPorPosto passou a ser exportada só para a interface, aumentando a API pública do cálculo (src/calculo/montar-quadro.ts)
+
+## T-05.5 — Lista de apoios: decisões tomadas sem o dono
+
+- **Ordem na página:** a lista de apoios, com o seletor Antes/Depois, fica entre o resumo do dia e os
+  cartões, para a decisão aparecer antes da lista longa de setores no celular. A SPEC-05 lista o apoio
+  depois dos cartões.
+- **O que o Depois aplica:** só os apoios aceitos (aceitar, editar leitos, trocar apoiador ou adicionar
+  conta como aceite). As sugestões ainda pendentes não entram no Depois.
+- **Edição do quadro com apoios aceitos:** os aceitos continuam na lista; as sugestões pendentes se refazem
+  na hora. Um aceito que deixa de valer (por exemplo, cede mais leitos do que o setor tem) fica na lista com
+  a mensagem do cálculo e sai do Depois. Trocar o tipo de dia ou a fonte (novo relatório ou preencher à mão)
+  zera os apoios.
+- **Adicionar no mesmo par:** adicionar um apoio para um par que já existe soma os leitos.
+
+## T-05.5 (rodada 1)
+
+- Lista de apoios posicionada antes dos cartões, diferente da ordem da SPEC-05 (decisão registrada em _pendencias.md) (src/componentes/Pagina.tsx)
+- Testes de componente usam renderToStaticMarkup, sem interação via Testing Library (aceitar/remover/alternar Antes/Depois por clique) como a spec sugere (src/componentes/lista-apoios.test.ts)
+- Par removido fica em 'descartados' de forma permanente; se readicionado manualmente entra aceito, mas a sugestão daquele par não volta sozinha (src/componentes/apoios-dia.ts)

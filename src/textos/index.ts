@@ -184,5 +184,54 @@ export const textos = {
     avisos: {
       nemTodosNoVerde: 'Nem todos os setores cabem no verde hoje.',
     },
+    lista: {
+      titulo: 'Apoio entre setores',
+      leitos: (n: number) => (n === 1 ? '1 leito' : `${n} leitos`),
+      apoia: 'apoia',
+      do: 'do',
+      /** "4.5 apoia 3 leitos do 4.3", para leitores de tela e rótulos. */
+      frase: (d: { de: string; para: string; leitos: number }) =>
+        `${d.de} apoia ${d.leitos === 1 ? '1 leito' : `${d.leitos} leitos`} do ${d.para}`,
+      sugerido: 'Sugestão',
+      aceito: 'Aceito',
+      aceitar: 'Aceitar',
+      aceitarRotulo: (frase: string) => `Aceitar: ${frase}`,
+      leitosRotulo: 'Leitos',
+      menosLeito: (frase: string) => `Tirar um leito: ${frase}`,
+      maisLeito: (frase: string) => `Pôr um leito: ${frase}`,
+      apoiador: 'Quem apoia',
+      trocarRotulo: (para: string) => `Setor que apoia o ${para}`,
+      remover: 'Remover',
+      removerRotulo: (frase: string) => `Remover: ${frase}`,
+      vazio: 'Nenhum apoio sugerido: todos os setores já estão no verde.',
+      semMedia: 'Sem média do dia, não há sugestão de apoio.',
+      incompleto: 'A sugestão é a que chega mais perto do verde. Ajuste os médicos ou os apoios se precisar.',
+      vista: {
+        legenda: 'Carga nos cartões',
+        antes: 'Antes',
+        depois: 'Depois',
+        notaAntes: 'Os cartões mostram a carga sem apoio.',
+        notaDepois: (n: number) =>
+          n === 0
+            ? 'Nenhum apoio aceito ainda: os cartões mostram a carga sem apoio.'
+            : `Os cartões mostram a carga com ${n === 1 ? 'o apoio aceito' : `os ${n} apoios aceitos`}.`,
+      },
+      adicionar: {
+        abrir: 'Adicionar apoio',
+        titulo: 'Novo apoio',
+        apoiador: 'Setor que apoia',
+        apoiado: 'Setor apoiado',
+        leitos: 'Leitos',
+        confirmar: 'Adicionar',
+        cancelar: 'Cancelar',
+        semSetores: 'Não há setores que possam apoiar ou receber apoio no quadro de hoje.',
+      },
+      notaCartao: {
+        apoia: (d: { para: string; leitos: number }) =>
+          `Apoia ${d.leitos === 1 ? '1 leito' : `${d.leitos} leitos`} do ${d.para}.`,
+        apoiado: (d: { de: string; leitos: number }) =>
+          `${d.leitos === 1 ? '1 leito apoiado' : `${d.leitos} leitos apoiados`} pelo ${d.de}.`,
+      },
+    },
   },
 } as const;

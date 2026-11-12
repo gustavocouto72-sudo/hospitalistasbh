@@ -6,6 +6,7 @@ import { textos } from '@/textos';
 import { QuadroSetores } from './QuadroSetores';
 import { ResumoDia } from './ResumoDia';
 import { painelDoDia } from './painel-dia';
+import { aplicarApoios } from '@/calculo/aplicar-apoios';
 
 const nada = () => undefined;
 const posto = (codigo: string, hospitalistas: number, cardioGeriatria = 0, potenciaisAdmissoes = 0) => ({
@@ -122,6 +123,31 @@ describe('QuadroSetores', () => {
     expect(html).toContain('2.3');
     expect(html).toContain('5.1');
     expect(quadro(POSTOS.filter((p) => p.hospitalistas > 0))).not.toContain('<details');
+  });
+});
+
+describe('QuadroSetores no Depois', () => {
+  it('mostra a carga com os apoios aceitos e diz no cartão quem apoia quem', () => {
+    const antes = painelDoDia(POSTOS, 'semana', {});
+    const apoios = [{ de: '4.5', para: '4.3', leitos: 4 }];
+    const depois = aplicarApoios(antes, apoios);
+    const html = renderToStaticMarkup(
+      createElement(QuadroSetores, {
+        painel: depois,
+        postos: POSTOS,
+        ajustes: {},
+        fonte: 'relatorio',
+        apoios,
+        legenda: textos.apoio.lista.vista.notaDepois(1),
+        aoAjustarMedicos: nada,
+        aoAjustarContagem: nada,
+      }),
+    );
+    expect(html).toContain(textos.apoio.lista.vista.notaDepois(1));
+    // 4.3: 30 − 4 = 26 pacientes para 2 médicos.
+    expect(cartao(html, '4.3')).toContain('>13<');
+    expect(cartao(html, '4.3')).toContain(textos.apoio.lista.notaCartao.apoiado({ de: '4.5', leitos: 4 }));
+    expect(cartao(html, '4.5')).toContain(textos.apoio.lista.notaCartao.apoia({ para: '4.3', leitos: 4 }));
   });
 });
 
