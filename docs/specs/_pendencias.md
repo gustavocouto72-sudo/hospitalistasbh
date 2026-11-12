@@ -197,3 +197,18 @@ dono tiver a tabela real do fim de semana, vale conferir.
 
 - Cores do fim de semana derivadas da regra, sem tabela de referência na spec (pendência já registrada) (test/aceitacao-amostra.test.ts)
 - Números da fixture da T-02.1 alterados para servir ao aceite da SPEC-03; o acoplamento entre as specs está documentado em _pendencias.md (test/fixtures/gerar.ts)
+
+## T-04.1 — `aplicarApoios` com apoio inválido
+
+A spec não diz o que fazer quando a edição manual cria um apoio inválido. Ficou o mais simples:
+`aplicarApoios` recusa com `RangeError` (texto em `src/textos/`) leitos que não são inteiros ≥ 1, setor
+apoiando a si mesmo, setor fora do quadro, setor de escala própria, apoiador sem médico, setor que apoia e
+é apoiado ao mesmo tempo e setor que cede mais leitos do que tem. A interface (T-05/F3) deve validar antes
+ou mostrar a mensagem. Um setor sem médico que cede todos os leitos passa a `vazio`, fora do semáforo.
+O resultado (`PainelComApoios`) guarda os números de antes em `antes`, mais `leitosCedidos`,
+`leitosRecebidos` e `pacientes` (reais, sem o peso 1,25).
+
+## T-04.1 (rodada 1)
+
+- A spec descreve aplicarApoios → Painel; a função devolve PainelComApoios, compatível com Painel, o que está documentado e testado (src/calculo/aplicar-apoios.ts)
+- O teste 'o resultado serve onde se espera um Painel' está fora do describe principal (src/calculo/aplicar-apoios.test.ts)

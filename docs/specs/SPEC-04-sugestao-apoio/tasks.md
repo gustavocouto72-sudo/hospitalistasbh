@@ -1,6 +1,6 @@
 # Tasks — SPEC-04 Sugestão de apoio
 
-- [ ] **T-04.1 — Tipos e aplicarApoios**
+- [x] **T-04.1 — Tipos e aplicarApoios**
   - Depende de: T-03.4
   - Aceite:
     - Tipo `Apoio`.

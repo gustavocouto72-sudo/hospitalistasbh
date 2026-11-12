@@ -50,4 +50,17 @@ export const textos = {
         'Nenhum setor tem médicos, então não há média do dia. Informe os médicos de cada setor para calcular a carga.',
     },
   },
+  apoio: {
+    erros: {
+      leitosInvalidos: (d: { de: string; para: string; leitos: number }) =>
+        `Apoio do ${d.de} ao ${d.para}: ${d.leitos} leitos não é um número inteiro maior que zero.`,
+      mesmoSetor: (setor: string) => `O setor ${setor} não pode apoiar a si mesmo.`,
+      setorInexistente: (setor: string) => `O setor ${setor} não está no quadro do dia.`,
+      escalaPropria: (setor: string) => `O setor ${setor} tem escala própria e não entra em apoios.`,
+      apoiadorSemMedico: (setor: string) => `O setor ${setor} está sem médico e não pode apoiar outro setor.`,
+      apoiadorEApoiado: (setor: string) => `O setor ${setor} não pode apoiar e ser apoiado ao mesmo tempo.`,
+      cedeDemais: (d: { setor: string; cedidos: number; carga: number }) =>
+        `O setor ${d.setor} cederia ${d.cedidos} leitos, mas tem só ${d.carga} pacientes.`,
+    },
+  },
 } as const;

@@ -114,3 +114,41 @@ export type Painel = {
 
 /** Cor do semáforo, da mais folgada (`azulEscuro`) à mais carregada (`vermelho`) (SPEC-03, `corDoSemaforo`). */
 export type Cor = 'azulEscuro' | 'azulClaro' | 'verde' | 'amarelo' | 'vermelho';
+
+/**
+ * "O setor `de` apoia `leitos` leitos do setor `para`" (SPEC-04, "Termos"). Leitos inteiros, ≥ 1.
+ */
+export type Apoio = {
+  /** Id do setor apoiador. */
+  readonly de: string;
+  /** Id do setor apoiado. */
+  readonly para: string;
+  readonly leitos: number;
+};
+
+/** Peso de cada leito de apoio para o setor que apoia (SPEC-04; PRD §6.4). */
+export const PESO_DO_APOIO = 1.25;
+
+/** Números do setor antes do apoio, como saíram de `calcularCarga`. */
+export type AntesDoApoio = Pick<SetorNoPainel, 'estado' | 'carga' | 'cargaPorMedico' | 'diferenca'>;
+
+/**
+ * Setor depois dos apoios. `estado`, `carga`, `cargaPorMedico` e `diferenca` passam a valer depois do apoio,
+ * com `carga` ponderada (carga − cedidos + 1,25 × recebidos) e a diferença contra a média de antes.
+ */
+export type SetorComApoio = SetorNoPainel & {
+  readonly antes: AntesDoApoio;
+  readonly leitosCedidos: number;
+  readonly leitosRecebidos: number;
+  /** Pacientes reais depois do apoio, sem o peso 1,25: carga − cedidos + recebidos. */
+  readonly pacientes: number;
+};
+
+/**
+ * Resultado de `aplicarApoios`. `media`, `cargaTotal` e `medicosTotal` são os de antes do apoio: a média não
+ * muda, porque os pacientes reais são os mesmos. É atribuível a `Painel`.
+ */
+export type PainelComApoios = Omit<Painel, 'setores'> & {
+  readonly setores: readonly SetorComApoio[];
+  readonly apoios: readonly Apoio[];
+};
