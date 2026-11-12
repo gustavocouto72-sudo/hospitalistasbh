@@ -1,6 +1,6 @@
 # Divisão de carga dos hospitalistas
 
-Calculadora web aberta e sem login, publicada na Vercel. Lê o relatório 9998 do TASY, mostra a carga por médico em cada setor num semáforo de cinco cores e sugere leitos de apoio entre setores. Nada é guardado. Fase atual: fundação (SPEC-01) em construção.
+Calculadora web aberta e sem login, publicada na Vercel. Lê o relatório 9998 do TASY, mostra a carga por médico em cada setor num semáforo de cinco cores e sugere leitos de apoio entre setores. Nada é guardado. No ar em https://hospitalistasbh.vercel.app. Pendências do dono em `docs/specs/_pendencias.md`.
 
 ## Leia antes de mudar algo
 
