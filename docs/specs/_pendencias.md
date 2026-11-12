@@ -23,3 +23,17 @@ A verificação do loop roda `pnpm lint` e `pnpm test` em toda task, então a T-
 - `next start -p 3010` não funciona com `output: 'export'` no Next 16 (script presente como pede o aceite; registrado em _pendencias.md) (package.json)
 - Node local 26 diverge do fixado 24.22.1 e o pnpm avisa 'Unsupported engine' (.nvmrc)
 - AGENTS.md gerado automaticamente pelo next dev entrou no diff (AGENTS.md)
+
+## T-01.2 — Prettier "no padrão do OncoWay"
+
+O OncoWay não usa Prettier (não há config nem dependência), então não havia padrão a copiar. Ficou
+o Prettier 3.9.10 com o estilo que o código já segue (aspas simples, ponto e vírgula, vírgula final,
+linha de 120), o `eslint-config-prettier` por último no ESLint, `pnpm lint` rodando também
+`prettier --check .` e `pnpm format` para corrigir. Markdown e `docs/` ficam fora do Prettier para não
+reescrever as specs. Ajustar se o dono preferir outro estilo.
+
+## T-01.2 (rodada 1)
+
+- Teste de qualidade compara as strings exatas dos scripts; qualquer ajuste neles vai quebrar o teste (test/qualidade.test.ts)
+- Prettier 'no padrão do OncoWay' não tinha referência a seguir; o estilo escolhido foi registrado em _pendencias.md para o dono validar (docs/specs/_pendencias.md)
+- Markdown e docs/ fora do Prettier (intencional) (.prettierignore)

@@ -7,7 +7,7 @@
     - Next.js com TypeScript estrito, `output: 'export'`, pnpm e Node fixado (mesma versão do OncoWay).
     - `next dev -p 3010` e `next start -p 3010` no `package.json`.
 
-- [ ] **T-01.2 — Ferramentas de qualidade**
+- [x] **T-01.2 — Ferramentas de qualidade**
   - Depende de: T-01.1
   - Aceite:
     - Vitest, ESLint e Prettier configurados.
