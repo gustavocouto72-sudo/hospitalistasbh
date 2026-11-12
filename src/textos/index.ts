@@ -41,6 +41,36 @@ export const textos = {
     juntarPostos: (postos: readonly string[]) => postos.join(' + '),
     numero: (valor: number) => NUMERO.format(valor),
   },
+  subir: {
+    titulo: 'Relatório do dia',
+    instrucao: 'Arraste o relatório 9998 do TASY até aqui',
+    soltar: 'Solte para ler o relatório',
+    ou: 'ou',
+    escolher: 'Escolher arquivo',
+    trocar: 'Escolher outro arquivo',
+    formatos: 'Aceita .xls, .csv e .xlsx.',
+    privacidade: 'O arquivo é lido só neste aparelho. Nada é enviado nem guardado.',
+    semRelatorio: 'Sem o relatório?',
+    preencherAMao: 'Preencher à mão',
+    resumo: {
+      lido: (d: { nome: string; postos: number }) =>
+        `${d.nome}: ${d.postos} ${d.postos === 1 ? 'posto lido' : 'postos lidos'}.`,
+      nenhumPosto: (nome: string) => `${nome}: nenhum posto pôde ser lido. Veja os erros abaixo.`,
+      manual: 'Preenchimento à mão: o quadro começa zerado e as contagens são digitadas nos cartões.',
+      lendo: (nome: string) => `Lendo ${nome}…`,
+    },
+    erros: {
+      extensao: (nome: string) =>
+        `O arquivo "${nome}" não é .xls, .csv nem .xlsx. Escolha o relatório 9998 exportado pelo TASY.`,
+      ilegivel: 'Não foi possível abrir o arquivo neste aparelho. Tente escolher de novo.',
+    },
+    mensagens: {
+      erros: (n: number) => (n === 1 ? '1 erro' : `${n} erros`),
+      avisos: (n: number) => (n === 1 ? '1 aviso' : `${n} avisos`),
+      ajudaErros: 'As linhas com erro ficaram de fora. Corrija o arquivo e suba de novo, ou digite as contagens.',
+      ajudaAvisos: 'Os avisos não impedem a leitura. Confira os números antes de seguir.',
+    },
+  },
   leitura: {
     erros: {
       semPostos: 'Relatório sem postos: o arquivo não traz nenhuma linha de posto para ler.',

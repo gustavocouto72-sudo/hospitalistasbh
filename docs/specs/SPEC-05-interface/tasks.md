@@ -13,7 +13,7 @@
     - Padrão pelo dia da semana e troca manual.
     - O quadro padrão muda junto com o seletor.
 
-- [ ] **T-05.3 — Subir relatório e preencher à mão**
+- [x] **T-05.3 — Subir relatório e preencher à mão**
   - Depende de: T-05.1, T-02.4
   - Aceite:
     - Arrastar e soltar, mais botão.

@@ -285,3 +285,8 @@ o `DESIGN.md` ao fim do loop. Também ficou de fora o modo escuro: só há tema 
 - Trocar o tipo de dia descarta os médicos ajustados à mão (decisão registrada nas pendências) (src/componentes/estado-dia.ts)
 - Tabela provisória 'Médicos por setor', a ser substituída pelos cartões da T-05.4 (src/componentes/QuadroPadrao.tsx)
 - Lógica pura de estado em src/componentes em vez de um módulo sem React (src/componentes/estado-dia.ts)
+
+## T-05.3 (rodada 1)
+
+- O bloco de falha fica fora da região aria-live, mas é anunciado pelo role="alert" (src/componentes/SubirRelatorio.tsx)
+- Status da task mudado à mão para [~] no tasks.md, quando a regra do loop é mudar só pelo enxuto.mjs (docs/specs/SPEC-05-interface/tasks.md)
