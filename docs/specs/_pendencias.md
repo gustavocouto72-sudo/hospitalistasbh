@@ -266,3 +266,22 @@ o `DESIGN.md` ao fim do loop. Também ficou de fora o modo escuro: só há tema 
 - Direção visual escolhida sem a etapa de decisão da skill e sem o dono; PRODUCT.md inferido do PRD (PRODUCT.md)
 - As razões de contraste citadas no DESIGN.md (por exemplo, 15,6:1) não são conferidas pelo teste, que só garante o mínimo AA (DESIGN.md)
 - A régua de cinco casas está só descrita, ainda sem componente nem token próprio (DESIGN.md)
+
+## T-05.2 — Topo e seletor de tipo de dia
+
+- **Trocar o tipo de dia descarta os médicos ajustados.** Os ajustes de médicos são por setor, e os setores
+  mudam entre os quadros (o 4.3 tem 2 médicos na semana e 1 no fim de semana). Para não levar um ajuste de um
+  quadro para o outro, a troca volta aos médicos padrão do novo quadro. As contagens digitadas, que são por
+  posto, continuam valendo.
+- **O dia fica fixo enquanto a página está aberta.** O padrão vem da data do aparelho ao abrir a página e não
+  muda sozinho à meia-noite, para o quadro não trocar no meio do uso. Recarregar recalcula.
+- **Sem `localStorage` para o último tipo escolhido.** A spec permite como exceção opcional; ficou de fora por
+  simplicidade, e o padrão pelo dia da semana já acerta na maioria das vezes.
+- **Tabela provisória "Médicos por setor".** Mostra o quadro padrão que o seletor troca, com o total de
+  médicos. Os cartões de setor da T-05.4 tomam o lugar dela.
+
+## T-05.2 (rodada 1)
+
+- Trocar o tipo de dia descarta os médicos ajustados à mão (decisão registrada nas pendências) (src/componentes/estado-dia.ts)
+- Tabela provisória 'Médicos por setor', a ser substituída pelos cartões da T-05.4 (src/componentes/QuadroPadrao.tsx)
+- Lógica pura de estado em src/componentes em vez de um módulo sem React (src/componentes/estado-dia.ts)

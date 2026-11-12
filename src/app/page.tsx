@@ -1,3 +1,5 @@
+import { Pagina } from '@/componentes/Pagina';
+
 export default function Inicio() {
-  return <main />;
+  return <Pagina />;
 }

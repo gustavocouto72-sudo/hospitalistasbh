@@ -1,5 +1,13 @@
 import type { MotivoContagemInvalida } from '../relatorio/numeros';
 
+const DATA_POR_EXTENSO = new Intl.DateTimeFormat('pt-BR', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+const NUMERO = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 });
+
 const MOTIVO: Record<MotivoContagemInvalida, string> = {
   vazio: 'está vazio',
   texto: 'não é um número',
@@ -10,6 +18,28 @@ const MOTIVO: Record<MotivoContagemInvalida, string> = {
 export const textos = {
   app: {
     titulo: 'Divisão de carga dos hospitalistas',
+  },
+  topo: {
+    /** "Quinta-feira, 12 de novembro de 2026". */
+    data: (data: Date) => {
+      const texto = DATA_POR_EXTENSO.format(data);
+      return texto.charAt(0).toUpperCase() + texto.slice(1);
+    },
+    tipoDia: {
+      legenda: 'Tipo de dia',
+      semana: 'Dia de semana',
+      fimDeSemana: 'Fim de semana',
+    },
+  },
+  quadroPadrao: {
+    titulo: 'Médicos por setor',
+    setor: 'Setor',
+    postos: 'Postos',
+    medicos: 'Médicos',
+    escalaPropria: 'Escala própria',
+    totalMedicos: 'Total de médicos',
+    juntarPostos: (postos: readonly string[]) => postos.join(' + '),
+    numero: (valor: number) => NUMERO.format(valor),
   },
   leitura: {
     erros: {

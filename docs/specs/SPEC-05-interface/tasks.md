@@ -7,7 +7,7 @@
     - Direção registrada em `DESIGN.md` na raiz.
     - Não bloqueia o loop: o dono revisa a direção visual ao fim.
 
-- [ ] **T-05.2 — Topo e seletor de tipo de dia**
+- [x] **T-05.2 — Topo e seletor de tipo de dia**
   - Depende de: T-05.1, T-03.1
   - Aceite:
     - Padrão pelo dia da semana e troca manual.
