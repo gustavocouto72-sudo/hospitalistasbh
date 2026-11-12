@@ -77,3 +77,17 @@ basta tirar esse ramo e trocar a fixture por Latin-1.
 
 - Heurística extra de UTF-8 sem BOM vai além da spec (documentada em _pendencias.md) (src/relatorio/decodificar.ts)
 - Parâmetro `nome` de decodificarRelatorio não é usado (src/relatorio/decodificar.ts)
+
+## T-02.3 — Ponto decimal e ordinal opcional
+
+- `lerNumero` aceita, além da vírgula (`11,2`, `,5`), o ponto como decimal (`2.5`), para CSV ou xlsx
+  salvos por outra ferramenta. Não há separador de milhar. Se o dono quiser só a vírgula, basta trocar
+  `[.,]` por `,` em `src/relatorio/numeros.ts`.
+- `extrairCodigoPosto` aceita o nome mesmo sem o ordinal (`Posto 2 - 4 PAV` → `4.2`), além de `º`, `°`,
+  `o`, `Âº` e `Â°`.
+
+## T-02.3 (rodada 1)
+
+- lerNumero aceita ponto decimal além da vírgula, indo um pouco além da spec (registrado em _pendencias.md) (src/relatorio/numeros.ts)
+- extrairCodigoPosto aceita o nome sem ordinal, indo um pouco além da spec (registrado em _pendencias.md) (src/relatorio/posto.ts)
+- lerContagem('-0') é aceita e devolve -0 (src/relatorio/numeros.ts)

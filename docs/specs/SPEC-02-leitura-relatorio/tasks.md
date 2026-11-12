@@ -14,7 +14,7 @@
     - Latin-1 é o padrão para texto, e UTF-8 é usado quando há BOM.
     - Testes verdes.
 
-- [ ] **T-02.3 — Cabeçalho, código do posto e números**
+- [x] **T-02.3 — Cabeçalho, código do posto e números**
   - Depende de: T-02.2
   - Aceite:
     - Mapeamento das colunas por nome normalizado.
