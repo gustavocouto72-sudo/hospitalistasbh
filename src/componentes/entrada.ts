@@ -70,13 +70,13 @@ export function postosDaFonte(fonte: Fonte): readonly ContagemPosto[] {
 }
 
 /**
- * Uma fonte nova vale para o dia inteiro: as contagens digitadas sobre a anterior são descartadas. Médicos
- * e tipo de dia ficam como estão.
+ * Uma fonte nova vale para o dia inteiro: as contagens digitadas sobre a anterior são descartadas. Médicos,
+ * residentes e tipo de dia ficam como estão.
  */
 export function descartarContagens(estado: EstadoDia): EstadoDia {
   if (estado.ajustes.contagens === undefined) return estado;
-  const { medicos } = estado.ajustes;
-  return { ...estado, ajustes: medicos ? { medicos } : {} };
+  const { medicos, residentes } = estado.ajustes;
+  return { ...estado, ajustes: { ...(medicos && { medicos }), ...(residentes && { residentes }) } };
 }
 
 export function resumoDaFonte(fonte: Fonte): string | null {

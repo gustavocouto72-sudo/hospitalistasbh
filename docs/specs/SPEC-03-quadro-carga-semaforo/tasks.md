@@ -33,3 +33,11 @@
   - Depende de: T-03.4, T-02.4
   - Aceite:
     - Da fixture até o painel, a tabela da spec bate na semana e no fim de semana.
+
+- [x] **T-03.6 — Residente (pedido do dono, 12/11/2026)**
+  - O residente é definido no dia, de manhã, sobretudo no fim de semana. Divide a carga do setor, mas conta como meio médico (`PESO_DO_RESIDENTE = 0,5`, em `src/calculo/residente.ts`).
+  - Aceite:
+    - `Ajustes.residentes` por setor; `montarQuadro` soma 0,5 aos médicos da conta e guarda `medicosDaEscala` e `residente` à parte. A escala própria ignora o residente.
+    - A carga por médico, a média, o semáforo e a sugestão de apoio usam os médicos com o residente.
+    - Na tela, só uma caixa "Residente" por setor, ao lado de Médicos; o 0,5 não aparece. O topo mostra quantos residentes há, e a folha escreve "1 + residente".
+    - Trocar o tipo de dia desmarca os residentes; subir outro relatório os mantém.

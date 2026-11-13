@@ -4,7 +4,14 @@ import { useId, useState } from 'react';
 import type { Ajustes, Apoio, ContagemDoPosto, Contagens, Painel, SetorNoPainel } from '@/calculo/tipos';
 import { textos } from '@/textos';
 import { nomeDoSetor } from './apoios-dia';
-import { contagensDosPostos, lerContagem, notasDoSetor, visualDoSetor } from './painel-dia';
+import {
+  contagensDosPostos,
+  lerContagem,
+  medicosDaEscala,
+  notasDoSetor,
+  residentes,
+  visualDoSetor,
+} from './painel-dia';
 import { AMOSTRA_COR, BOTAO_ICONE, CELULA_COR, IconeMais, IconeMenos } from './ui';
 
 const t = textos.planilha;
@@ -26,6 +33,7 @@ export type PropsPlanilha = {
   readonly postos: readonly ContagemDoPosto[];
   readonly ajustes: Ajustes;
   readonly aoAjustarMedicos: (setor: string, semAjuste: number, sentido: 1 | -1) => void;
+  readonly aoMarcarResidente: (setor: string, residente: boolean) => void;
   readonly aoAjustarContagem: (posto: string, campo: keyof Contagens, valor: number) => void;
 };
 
@@ -53,7 +61,7 @@ export function Planilha(props: PropsPlanilha) {
         <table className="w-full border-collapse text-rotulo md:min-w-[60rem]">
           <thead>
             <tr className="hidden border-b border-linha md:table-row">
-              <th colSpan={5} className="px-3 pt-2.5" aria-hidden="true" />
+              <th colSpan={6} className="px-3 pt-2.5" aria-hidden="true" />
               <th
                 colSpan={3}
                 scope="colgroup"
@@ -75,6 +83,9 @@ export function Planilha(props: PropsPlanilha) {
               </th>
               <th scope="col" className={`${TH} text-center`}>
                 {t.colunas.medicos}
+              </th>
+              <th scope="col" className={`${TH} text-center`}>
+                {t.colunas.residente}
               </th>
               <th scope="col" className={`${TH} ${NUM}`}>
                 {t.colunas.pacientes}
@@ -113,7 +124,8 @@ export function Planilha(props: PropsPlanilha) {
               <th scope="row" className={`${TD} sticky left-0 z-10 bg-papel text-left`}>
                 {t.total}
               </th>
-              <td className={`${TD} text-center ${NUM}`}>{c.numero(painel.medicosTotal)}</td>
+              <td className={`${TD} text-center ${NUM}`}>{c.numero(medicosDaEscala(painel))}</td>
+              <td className={`${TD} text-center ${NUM}`}>{residentes(painel) > 0 ? residentes(painel) : ''}</td>
               <td className={`${TD} ${NUM}`}>{temDados ? c.numero(totalDe(painel, 'hospitalistas')) : '—'}</td>
               <td className={`${TD} ${NUM} ${SECUNDARIA} text-tinta-suave`}>
                 {temDados ? c.numero(totalDe(painel, 'cardioGeriatria')) : '—'}
@@ -164,6 +176,17 @@ function Linha(props: PropsPlanilha & { readonly setor: SetorNoPainel; readonly 
       </th>
       <td className={`${TD} text-center`}>
         {propria ? <span className="text-tinta-suave">{t.escalaPropria}</span> : <Medicos {...props} setor={setor} />}
+      </td>
+      <td className={`${TD} text-center`}>
+        {propria ? null : (
+          <input
+            type="checkbox"
+            checked={setor.residente}
+            aria-label={t.residenteNo(setor.nome)}
+            onChange={(evento) => props.aoMarcarResidente(setor.id, evento.currentTarget.checked)}
+            className="size-4 cursor-pointer accent-tinta pointer-coarse:size-6"
+          />
+        )}
       </td>
       {CAMPOS.map((campo) => (
         <td
@@ -283,20 +306,20 @@ function Medicos({ setor, aoAjustarMedicos }: PropsPlanilha & { readonly setor: 
     <div role="group" aria-label={`${c.medicos} do ${setor.nome}`} className="inline-flex items-center gap-1">
       <button
         type="button"
-        disabled={setor.medicos <= 0}
+        disabled={setor.medicosDaEscala <= 0}
         aria-label={c.menosMedico(setor.nome)}
-        onClick={() => aoAjustarMedicos(setor.id, setor.medicos, -1)}
+        onClick={() => aoAjustarMedicos(setor.id, setor.medicosDaEscala, -1)}
         className={BOTAO_ICONE}
       >
         <IconeMenos />
       </button>
       <output aria-live="polite" className="min-w-9 text-center text-corpo font-semibold tabular-nums">
-        {c.numero(setor.medicos)}
+        {c.numero(setor.medicosDaEscala)}
       </output>
       <button
         type="button"
         aria-label={c.maisMedico(setor.nome)}
-        onClick={() => aoAjustarMedicos(setor.id, setor.medicos, 1)}
+        onClick={() => aoAjustarMedicos(setor.id, setor.medicosDaEscala, 1)}
         className={BOTAO_ICONE}
       >
         <IconeMais />

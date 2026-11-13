@@ -13,7 +13,14 @@ import {
   postosDaFonte,
   preencherAMao,
 } from './entrada';
-import { ESTADO_INICIAL, ajustarContagem, ajustarMedicos, escolherTipoDia, tipoDiaAtual } from './estado-dia';
+import {
+  ESTADO_INICIAL,
+  ajustarContagem,
+  ajustarMedicos,
+  escolherTipoDia,
+  marcarResidente,
+  tipoDiaAtual,
+} from './estado-dia';
 import {
   APOIOS_INICIAL,
   adicionarApoio,
@@ -145,6 +152,7 @@ export function Pagina() {
               aoAjustarMedicos={(setor, semAjuste, sentido) =>
                 setEstado((atual) => ajustarMedicos(atual, setor, semAjuste, sentido))
               }
+              aoMarcarResidente={(setor, residente) => setEstado((atual) => marcarResidente(atual, setor, residente))}
               aoAjustarContagem={(posto, campo, valor) =>
                 setEstado((atual) => ajustarContagem(atual, posto, campo, valor))
               }

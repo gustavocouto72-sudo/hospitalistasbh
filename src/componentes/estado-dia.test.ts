@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { QUADROS_PADRAO } from '@/config/quadros';
-import { ESTADO_INICIAL, escolherTipoDia, quadroDoDia, tipoDiaAtual } from './estado-dia';
+import { ESTADO_INICIAL, escolherTipoDia, marcarResidente, quadroDoDia, tipoDiaAtual } from './estado-dia';
 
 describe('estado do tipo de dia', () => {
   it('começa sem escolha manual e segue o padrão do dia', () => {
@@ -44,5 +44,20 @@ describe('estado do tipo de dia', () => {
     expect(escolherTipoDia(ajustado, 'semana', 'fimDeSemana')).toBe(ajustado);
     const peloPadrao = { escolhaManual: null, ajustes: { medicos: { '4.3': 3 } } };
     expect(escolherTipoDia(peloPadrao, 'semana', 'semana')).toBe(peloPadrao);
+  });
+});
+
+describe('residente', () => {
+  it('marca e desmarca o residente de um setor, sem mexer no resto', () => {
+    const base = { escolhaManual: null, ajustes: { medicos: { '4.3': 3 } } };
+    const marcado = marcarResidente(base, '4.3', true);
+    expect(marcado.ajustes.residentes).toEqual({ '4.3': true });
+    expect(marcado.ajustes.medicos).toEqual({ '4.3': 3 });
+    expect(marcarResidente(marcado, '4.3', false).ajustes.residentes).toEqual({ '4.3': false });
+  });
+
+  it('trocar o tipo de dia desmarca os residentes, que valiam para os setores do outro quadro', () => {
+    const marcado = marcarResidente(ESTADO_INICIAL, '4.3', true);
+    expect(escolherTipoDia(marcado, 'fimDeSemana', 'semana').ajustes.residentes).toBeUndefined();
   });
 });

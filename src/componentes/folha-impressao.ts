@@ -6,7 +6,7 @@ import { aplicarApoios } from '@/calculo/aplicar-apoios';
 import type { Painel, SetorNoPainel } from '@/calculo/tipos';
 import { textos } from '@/textos';
 import { apoiosEmVigor, nomeDoSetor, type ItemDaLista } from './apoios-dia';
-import { visualDoSetor, type VisualDoSetor } from './painel-dia';
+import { medicosDaEscala, visualDoSetor, type VisualDoSetor } from './painel-dia';
 
 export type LinhaDaFolha = {
   readonly id: string;
@@ -45,7 +45,12 @@ export function folhaDoDia(painel: Painel, lista: readonly ItemDaLista[]): Folha
     id: setor.id,
     nome: setor.nome,
     postos: textos.quadroPadrao.juntarPostos(setor.postos),
-    medicos: setor.estado === 'escalaPropria' ? textos.folha.semConta : numero(setor.medicos),
+    medicos:
+      setor.estado === 'escalaPropria'
+        ? textos.folha.semConta
+        : setor.residente
+          ? textos.folha.comResidente(numero(setor.medicosDaEscala))
+          : numero(setor.medicosDaEscala),
     pacientes: numero(setor.antes.carga),
     antes: porMedico(setor.antes),
     depois: porMedico(setor),
@@ -59,7 +64,7 @@ export function folhaDoDia(painel: Painel, lista: readonly ItemDaLista[]): Folha
     linhas,
     apoios,
     media: painel.media === null ? textos.folha.semConta : numero(painel.media),
-    medicos: numero(painel.medicosTotal),
+    medicos: numero(medicosDaEscala(painel)),
     pacientes: numero(painel.cargaTotal),
   };
 }

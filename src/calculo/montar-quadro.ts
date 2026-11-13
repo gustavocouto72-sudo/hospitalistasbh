@@ -6,7 +6,17 @@
  */
 import { QUADROS_PADRAO } from '../config/quadros';
 import { textos } from '../textos';
-import type { Ajustes, AvisoQuadro, ContagemDoPosto, Contagens, QuadroMontado, SetorMontado, TipoDia } from './tipos';
+import { PESO_DO_RESIDENTE } from './residente';
+import type {
+  Ajustes,
+  AvisoQuadro,
+  ContagemDoPosto,
+  Contagens,
+  QuadroMontado,
+  Setor,
+  SetorMontado,
+  TipoDia,
+} from './tipos';
 
 const ZERO: Contagens = { hospitalistas: 0, cardioGeriatria: 0, potenciaisAdmissoes: 0 };
 const CAMPOS = ['hospitalistas', 'cardioGeriatria', 'potenciaisAdmissoes'] as const;
@@ -62,6 +72,13 @@ export function montarQuadro(
   const medicosAjustados = ajustes.medicos ?? {};
   const medicosDe = (id: string, padrao: number) =>
     Object.hasOwn(medicosAjustados, id) ? validarMedicos(id, medicosAjustados[id] as number) : padrao;
+  const residentes = ajustes.residentes ?? {};
+  /** Médicos da escala, residente e médicos na conta. O residente não entra na escala própria. */
+  const equipe = (id: string, padrao: number, modo: Setor['modo']) => {
+    const medicosDaEscala = medicosDe(id, padrao);
+    const residente = modo === 'calculado' && residentes[id] === true;
+    return { medicosDaEscala, residente, medicos: medicosDaEscala + (residente ? PESO_DO_RESIDENTE : 0) };
+  };
 
   const avisos: AvisoQuadro[] = [];
   const noQuadro = new Set<string>();
@@ -84,7 +101,7 @@ export function montarQuadro(
         });
       }
     }
-    return { ...setor, medicos: medicosDe(setor.id, setor.medicos), contagens, postosAusentes };
+    return { ...setor, ...equipe(setor.id, setor.medicos, setor.modo), contagens, postosAusentes };
   });
 
   const postosOcultos: string[] = [];
@@ -98,7 +115,7 @@ export function montarQuadro(
       id: codigo,
       nome: codigo,
       postos: [codigo],
-      medicos: medicosDe(codigo, 0),
+      ...equipe(codigo, 0, 'calculado'),
       modo: 'calculado',
       contagens,
       postosAusentes: [],

@@ -84,3 +84,12 @@ export function resumoDoDia(painel: Painel): ResumoDoDia {
   }
   return { media: painel.media, medicos: painel.medicosTotal, pacientes: painel.cargaTotal, porCor };
 }
+
+/** Médicos da escala no dia, sem o meio médico dos residentes (que só existe na conta). */
+export function medicosDaEscala(painel: Painel): number {
+  return painel.setores.reduce((soma, s) => soma + (s.estado === 'escalaPropria' ? 0 : s.medicosDaEscala), 0);
+}
+
+export function residentes(painel: Painel): number {
+  return painel.setores.filter((s) => s.residente).length;
+}

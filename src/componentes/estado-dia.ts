@@ -22,8 +22,8 @@ export function quadroDoDia(tipoDia: TipoDia | null): Quadro | null {
 }
 
 /**
- * Troca o tipo de dia. Os médicos ajustados valem para os setores do quadro anterior e são descartados; as
- * contagens digitadas são por posto e continuam valendo.
+ * Troca o tipo de dia. Os médicos ajustados e os residentes valem para os setores do quadro anterior e são
+ * descartados; as contagens digitadas são por posto e continuam valendo.
  */
 export function escolherTipoDia(estado: EstadoDia, tipoDia: TipoDia, padrao: TipoDia | null): EstadoDia {
   if (tipoDiaAtual(estado, padrao) === tipoDia) return estado;
@@ -52,5 +52,13 @@ export function ajustarContagem(estado: EstadoDia, posto: string, campo: keyof C
   return {
     ...estado,
     ajustes: { ...estado.ajustes, contagens: { ...contagens, [posto]: { ...contagens[posto], [campo]: valor } } },
+  };
+}
+
+/** Marca ou desmarca o residente do setor. Médicos e contagens continuam valendo. */
+export function marcarResidente(estado: EstadoDia, setor: string, residente: boolean): EstadoDia {
+  return {
+    ...estado,
+    ajustes: { ...estado.ajustes, residentes: { ...estado.ajustes.residentes, [setor]: residente } },
   };
 }

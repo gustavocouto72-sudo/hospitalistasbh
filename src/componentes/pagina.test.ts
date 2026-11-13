@@ -93,6 +93,27 @@ describe('Página — Testing Library', () => {
     expect(porMedico(container, '4.3')).toBe('11,5');
   });
 
+  it('marcar residente conta meio médico na conta, sem mudar os médicos mostrados', async () => {
+    const { usuario, container } = await subirFixture();
+    const caixa = screen.getByRole('checkbox', { name: textos.planilha.residenteNo('4.3') });
+    expect((caixa as HTMLInputElement).checked).toBe(false);
+    await usuario.click(caixa);
+    // 23 pacientes com 2 médicos e 1 residente = 2,5 na conta.
+    expect(porMedico(container, '4.3')).toBe('9,2');
+    expect(linha(container, '4.3').querySelector('output')?.textContent).toBe('2');
+    expect(screen.getByText(textos.resumo.residentes)).toBeTruthy();
+    const folha = container.querySelector<HTMLElement>('section[data-folha]')!;
+    expect(within(folha).getByText(textos.folha.comResidente('2'))).toBeTruthy();
+    await usuario.click(caixa);
+    expect(porMedico(container, '4.3')).toBe('11,5');
+    expect(screen.queryByText(textos.resumo.residentes)).toBeNull();
+  });
+
+  it('a escala própria não tem caixa de residente', async () => {
+    await subirFixture();
+    expect(screen.queryByRole('checkbox', { name: textos.planilha.residenteNo('3.1') })).toBeNull();
+  });
+
   it('editar as contagens abre os campos por posto e recalcula', async () => {
     const { usuario, container } = await subirFixture();
     await usuario.click(screen.getByRole('button', { name: textos.planilha.editar }));

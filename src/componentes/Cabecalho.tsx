@@ -7,6 +7,7 @@ import type { Painel, TipoDia } from '@/calculo/tipos';
 import type { Aviso, Erro } from '@/relatorio/ler';
 import { textos } from '@/textos';
 import { EXTENSOES, primeiroArquivo, resumoDaFonte, type EstadoEntrada } from './entrada';
+import { medicosDaEscala, residentes } from './painel-dia';
 import {
   AMOSTRA_COR,
   BOTAO_PRINCIPAL,
@@ -237,8 +238,14 @@ function Media({ painel }: { readonly painel: Painel | null }) {
         </div>
         <div className="flex items-baseline gap-1.5">
           <dt className="text-rotulo text-tinta-suave">{textos.resumo.medicos}</dt>
-          <dd className="text-corpo font-semibold tabular-nums">{painel ? n(painel.medicosTotal) : '—'}</dd>
+          <dd className="text-corpo font-semibold tabular-nums">{painel ? n(medicosDaEscala(painel)) : '—'}</dd>
         </div>
+        {painel && residentes(painel) > 0 ? (
+          <div className="flex items-baseline gap-1.5">
+            <dt className="text-rotulo text-tinta-suave">{textos.resumo.residentes}</dt>
+            <dd className="text-corpo font-semibold tabular-nums">{residentes(painel)}</dd>
+          </div>
+        ) : null}
         <div className="flex items-baseline gap-1.5">
           <dt className="text-rotulo text-tinta-suave">{textos.resumo.pacientes}</dt>
           <dd className="text-corpo font-semibold tabular-nums">{painel ? n(painel.cargaTotal) : '—'}</dd>

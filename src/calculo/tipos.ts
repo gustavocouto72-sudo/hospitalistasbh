@@ -50,14 +50,22 @@ export type Contagens = {
  * Ajustes do dia, que vencem o quadro padrão e o relatório (SPEC-03, "Ajustes").
  * - `medicos`: por id de setor, em passos de 0,5 e ≥ 0. Ids que não existem no quadro do dia são ignorados.
  * - `contagens`: por código de posto, campo a campo. Um posto ausente no relatório passa a existir.
+ * - `residentes`: por id de setor, se o setor tem residente no dia. Ignorado na escala própria.
  */
 export type Ajustes = {
   readonly medicos?: Readonly<Record<string, number>>;
+  readonly residentes?: Readonly<Record<string, boolean>>;
   readonly contagens?: Readonly<Record<string, Partial<Contagens>>>;
 };
 
-/** Setor com as contagens do dia já somadas. */
+/**
+ * Setor com as contagens do dia já somadas. `medicos` é o que entra na conta: os médicos da escala mais meio
+ * médico se houver residente (`PESO_DO_RESIDENTE`).
+ */
 export type SetorMontado = Setor & {
+  /** Médicos da escala, como a equipe informou, sem o residente. */
+  readonly medicosDaEscala: number;
+  readonly residente: boolean;
   readonly contagens: Contagens;
   /** Postos do setor que não vieram no relatório nem foram digitados. */
   readonly postosAusentes: readonly string[];

@@ -21,6 +21,8 @@ function painel(setores: readonly SetorSintetico[]): Painel {
       nome: id,
       postos: [id],
       medicos,
+      medicosDaEscala: medicos,
+      residente: false,
       modo,
       contagens: { hospitalistas: carga, cardioGeriatria: 0, potenciaisAdmissoes: 0 },
       postosAusentes: [],
