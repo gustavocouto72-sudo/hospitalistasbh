@@ -34,3 +34,11 @@
   - Aceite:
     - SheetJS carregado por `import()` dinâmico, só para xlsx.
     - O bundle inicial não inclui SheetJS.
+
+- [x] **T-02.6 — Formato novo do relatório (13/11/2026)**
+  - A TI corrigiu o relatório. O cabeçalho passou a ser `Ds posto`, `Qt total setor`, `Qt cardiologia`, `Qt geriatria`, `Qt hospitalistas`, `Qt potenciais admissoes`, `Qt pac medico semana`, `Qt pac medico fim semana`, `Ft dia semana` e `Ft fim semana`. As contagens vêm com vírgula no fim (`20,`) e as linhas terminam em LF.
+  - Aceite:
+    - Cardiologia e geriatria separadas somam em `cardioGeriatria`; a coluna única antiga continua aceita.
+    - `20,` vale 20.
+    - Sem nenhuma das formas, o erro pede "Qt cardiologia" e "Qt geriatria".
+    - Fixture sintética `relatorio-9998-v2-latin1.xls` lida com os mesmos postos da antiga.

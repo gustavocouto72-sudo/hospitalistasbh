@@ -47,15 +47,53 @@ describe('T-02.3 — mapeamento das colunas', () => {
 
   it('diz quais colunas obrigatórias faltam', () => {
     const resultado = mapearColunas(['Ds posto', 'Qt hospitalistas', 'Qt potenciais admissoes']);
-    expect(resultado.faltando).toEqual(['cardioGeriatria']);
+    // Sem a coluna única, pede as separadas do formato atual.
+    expect(resultado.faltando).toEqual(['cardiologia', 'geriatria']);
     expect(resultado.indices).toEqual({ posto: 0, hospitalistas: 1, potenciaisAdmissoes: 2 });
   });
 
   it('com cabeçalho vazio, faltam todas', () => {
-    expect(mapearColunas([]).faltando).toEqual(['posto', 'hospitalistas', 'cardioGeriatria', 'potenciaisAdmissoes']);
+    expect(mapearColunas([]).faltando).toEqual([
+      'posto',
+      'hospitalistas',
+      'cardiologia',
+      'geriatria',
+      'potenciaisAdmissoes',
+    ]);
   });
 
   it('se a coluna se repete, vale a primeira', () => {
     expect(mapearColunas(['Ds posto', 'Ds posto', 'Qt hospitalistas']).indices.posto).toBe(0);
+  });
+});
+
+describe('formato novo do relatório (13/11/2026): cardiologia e geriatria separadas', () => {
+  const NOVO = [
+    'Ds posto',
+    'Qt total setor',
+    'Qt cardiologia',
+    'Qt geriatria',
+    'Qt hospitalistas',
+    'Qt potenciais admissoes',
+    'Qt pac medico semana',
+    'Qt pac medico fim semana',
+    'Ft dia semana',
+    'Ft fim semana',
+  ];
+
+  it('localiza cardiologia e geriatria no lugar da coluna única, e ignora o total do setor', () => {
+    expect(mapearColunas(NOVO)).toEqual({
+      indices: { posto: 0, cardiologia: 2, geriatria: 3, hospitalistas: 4, potenciaisAdmissoes: 5 },
+      faltando: [],
+    });
+  });
+
+  it('sem geriatria nem a coluna única, falta a geriatria', () => {
+    expect(mapearColunas(NOVO.filter((c) => c !== 'Qt geriatria')).faltando).toEqual(['geriatria']);
+  });
+
+  it('sem nenhuma das formas, faltam cardiologia e geriatria', () => {
+    const sem = NOVO.filter((c) => c !== 'Qt geriatria' && c !== 'Qt cardiologia');
+    expect(mapearColunas(sem).faltando).toEqual(['cardiologia', 'geriatria']);
   });
 });

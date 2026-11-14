@@ -1,9 +1,10 @@
 /**
- * Números do relatório (SPEC-02, "Números"): vírgula decimal, às vezes sem o zero à esquerda (`,5`).
+ * Números do relatório (SPEC-02, "Números"): vírgula decimal, às vezes sem o zero à esquerda (`,5`) e, no
+ * formato de 13/11/2026, com a vírgula no fim e sem decimais (`20,`).
  * O ponto também vale como decimal, para CSV ou xlsx salvos por outra ferramenta. Separador de milhar
  * não é aceito, porque as contagens por posto são pequenas.
  */
-const NUMERO = /^-?(?:\d+(?:[.,]\d+)?|[.,]\d+)$/u;
+const NUMERO = /^-?(?:\d+(?:[.,]\d*)?|[.,]\d+)$/u;
 
 /** Lê um número com vírgula ou ponto decimal; `undefined` se a célula não for um número. */
 export function lerNumero(texto: string): number | undefined {

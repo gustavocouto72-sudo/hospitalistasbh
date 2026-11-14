@@ -117,14 +117,15 @@ describe('T-02.4 — casos de borda', () => {
   it('coluna obrigatória ausente → erro que diz qual coluna falta, e nenhum posto', async () => {
     const resultado = await lerFixture('borda-coluna-ausente.xls');
     expect(resultado.postos).toEqual([]);
-    expect(resultado.erros).toEqual([
-      {
+    // A fixture tira a coluna única de cardiologia e geriatria; o erro pede as colunas do formato atual.
+    expect(resultado.erros).toEqual(
+      ['Qt cardiologia', 'Qt geriatria'].map((coluna) => ({
         tipo: 'coluna-ausente',
-        coluna: 'Qt cardio geriatria',
-        mensagem: textos.leitura.erros.colunaAusente('Qt cardio geriatria'),
-      },
-    ]);
-    expect(resultado.erros[0]?.mensagem).toContain('Qt cardio geriatria');
+        coluna,
+        mensagem: textos.leitura.erros.colunaAusente(coluna),
+      })),
+    );
+    expect(resultado.erros[0]?.mensagem).toContain('Qt cardiologia');
   });
 
   it('várias colunas ausentes geram um erro para cada uma', () => {
@@ -133,7 +134,8 @@ describe('T-02.4 — casos de borda', () => {
       [nome(4, 2), '24'],
     ]);
     expect(resultado.erros.map((e) => (e.tipo === 'coluna-ausente' ? e.coluna : e.tipo))).toEqual([
-      'Qt cardio geriatria',
+      'Qt cardiologia',
+      'Qt geriatria',
       'Qt potenciais admissoes',
     ]);
   });
@@ -302,5 +304,46 @@ describe('T-02.4 — casos de borda', () => {
 describe('Zod sob a CSP (T-07.1)', () => {
   it('roda sem JIT, para não sondar Function() e violar a CSP sem unsafe-eval', () => {
     expect(z.config().jitless).toBe(true);
+  });
+});
+
+describe('formato novo do relatório (13/11/2026)', () => {
+  it('lê o arquivo novo com os mesmos postos do antigo, somando cardiologia e geriatria', async () => {
+    const antigo = await lerFixture('relatorio-9998-latin1.xls');
+    const novo = await lerFixture('relatorio-9998-v2-latin1.xls');
+    expect(novo.erros).toEqual([]);
+    expect(novo.avisos).toEqual([]);
+    expect(novo.postos).toEqual(antigo.postos);
+  });
+
+  it('cardiologia e geriatria somam em cardioGeriatria', () => {
+    const r = lerLinhas([
+      ['Ds posto', 'Qt total setor', 'Qt cardiologia', 'Qt geriatria', 'Qt hospitalistas', 'Qt potenciais admissoes'],
+      [nome(4, 3), '20,', '1,', '2,', '17,', '3,'],
+    ]);
+    expect(r.erros).toEqual([]);
+    expect(r.postos).toEqual([
+      { codigo: '4.3', nomeOriginal: nome(4, 3), hospitalistas: 17, cardioGeriatria: 3, potenciaisAdmissoes: 3 },
+    ]);
+  });
+
+  it('número inválido na geriatria cita a coluna da geriatria', () => {
+    const r = lerLinhas([
+      ['Ds posto', 'Qt cardiologia', 'Qt geriatria', 'Qt hospitalistas', 'Qt potenciais admissoes'],
+      [nome(4, 3), '1,', 'x', '17,', '3,'],
+    ]);
+    expect(r.postos).toEqual([]);
+    expect(r.erros[0]).toMatchObject({ tipo: 'numero-invalido', coluna: 'Qt geriatria', valor: 'x' });
+  });
+
+  it('sem cardiologia nem geriatria, o erro diz quais colunas faltam', () => {
+    const r = lerLinhas([
+      ['Ds posto', 'Qt hospitalistas', 'Qt potenciais admissoes'],
+      [nome(4, 3), '17,', '3,'],
+    ]);
+    expect(r.erros.map((e) => e.mensagem)).toEqual([
+      textos.leitura.erros.colunaAusente('Qt cardiologia'),
+      textos.leitura.erros.colunaAusente('Qt geriatria'),
+    ]);
   });
 });

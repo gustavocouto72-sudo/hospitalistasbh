@@ -285,10 +285,68 @@ const BORDAS: Record<string, string> = {
   ),
 };
 
+// ---------- formato novo do relatório (13/11/2026) ----------
+
+/**
+ * O TASY passou a separar cardiologia e geriatria, ganhou o total do setor, escreve as contagens com vírgula no
+ * fim (`20,`), chama os fatores de "Ft" e termina as linhas só com LF. A divisão entre cardiologia e geriatria
+ * é inventada; a soma é a mesma da amostra.
+ */
+export const CABECALHO_V2 = [
+  'Ds posto',
+  'Qt total setor',
+  'Qt cardiologia',
+  'Qt geriatria',
+  'Qt hospitalistas',
+  'Qt potenciais admissoes',
+  'Qt pac medico semana',
+  'Qt pac medico fim semana',
+  'Ft dia semana',
+  'Ft fim semana',
+];
+
+export const cardiologiaDe = (p: PostoDaAmostra) => Math.ceil(p.cardioGeriatria / 2);
+export const geriatriaDe = (p: PostoDaAmostra) => p.cardioGeriatria - cardiologiaDe(p);
+
+/** Contagem no estilo novo do TASY: inteiro com vírgula no fim. */
+const contagemV2 = (n: number) => `${n},`;
+
+const linhaV2 = (p: PostoDaAmostra) => [
+  p.nomeOriginal,
+  contagemV2(p.hospitalistas + p.cardioGeriatria),
+  contagemV2(cardiologiaDe(p)),
+  contagemV2(geriatriaDe(p)),
+  contagemV2(p.hospitalistas),
+  contagemV2(p.potenciaisAdmissoes),
+  contagemV2(Math.round(porMedico(p.hospitalistas, p.fatorSemana))),
+  contagemV2(Math.round(porMedico(p.hospitalistas, p.fatorFimDeSemana))),
+  numeroTasy(p.fatorSemana),
+  numeroTasy(p.fatorFimDeSemana),
+];
+
+const totalV2 = () => {
+  const somaDe = (f: (p: PostoDaAmostra) => number) => AMOSTRA.reduce((t, p) => t + f(p), 0);
+  return [
+    'Total',
+    contagemV2(somaDe((p) => p.hospitalistas + p.cardioGeriatria)),
+    contagemV2(somaDe(cardiologiaDe)),
+    contagemV2(somaDe(geriatriaDe)),
+    contagemV2(somaDe((p) => p.hospitalistas)),
+    contagemV2(somaDe((p) => p.potenciaisAdmissoes)),
+    contagemV2(0),
+    contagemV2(0),
+    numeroTasy(soma('fatorSemana')),
+    numeroTasy(soma('fatorFimDeSemana')),
+  ];
+};
+
+const TEXTO_V2 = [CABECALHO_V2, ...AMOSTRA.map(linhaV2), totalV2()].map((l) => l.join('\t')).join('\n') + '\n';
+
 export function gerarFixtures(): Record<string, Uint8Array> {
   const tabulado = texto(TABELA, '\t');
   return {
     'relatorio-9998-latin1.xls': emLatin1(tabulado),
+    'relatorio-9998-v2-latin1.xls': emLatin1(TEXTO_V2),
     'relatorio-9998-utf8-bom.xls': comBom(tabulado),
     'relatorio-9998-ponto-e-virgula.csv': emLatin1(texto(TABELA, ';')),
     'relatorio-9998-virgula.csv': emUtf8(texto(TABELA, ',', true)),

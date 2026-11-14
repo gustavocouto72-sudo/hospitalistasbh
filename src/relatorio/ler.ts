@@ -72,7 +72,8 @@ export const ResultadoLeituraSchema = z.strictObject({
 
 export type ResultadoLeitura = z.infer<typeof ResultadoLeituraSchema>;
 
-const CONTAGENS = COLUNAS.filter((c): c is Exclude<Coluna, 'posto'> => c !== 'posto');
+type ColunaDeContagem = Exclude<Coluna, 'posto'>;
+const CONTAGENS = COLUNAS.filter((c): c is ColunaDeContagem => c !== 'posto');
 
 const ehTotal = (nome: string) => normalizarNome(nome) === 'total';
 
@@ -108,9 +109,10 @@ export function lerLinhas(linhas: readonly (readonly string[])[]): ResultadoLeit
       return;
     }
 
-    const numeros: Partial<Record<Exclude<Coluna, 'posto'>, number>> = {};
+    const numeros: Partial<Record<ColunaDeContagem, number>> = {};
     let valida = true;
     for (const coluna of CONTAGENS) {
+      if (indices[coluna] === undefined) continue;
       const valor = celula(valores, coluna);
       const lido = lerContagem(valor);
       if (lido.ok) {
@@ -153,7 +155,7 @@ export function lerLinhas(linhas: readonly (readonly string[])[]): ResultadoLeit
       codigo,
       nomeOriginal,
       hospitalistas: numeros.hospitalistas as number,
-      cardioGeriatria: numeros.cardioGeriatria as number,
+      cardioGeriatria: numeros.cardioGeriatria ?? (numeros.cardiologia as number) + (numeros.geriatria as number),
       potenciaisAdmissoes: numeros.potenciaisAdmissoes as number,
     };
     if (posto.potenciaisAdmissoes > posto.hospitalistas) {
