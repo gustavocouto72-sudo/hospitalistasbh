@@ -43,7 +43,7 @@ export type PropsRecomendacao = {
 
 /**
  * Recomendação de apoio, enxuta, embaixo da planilha. Cada apoio é uma frase editável no lugar
- * ("4.5 apoia 2 leitos do 4.2"), e todos já valem na coluna "Com apoio".
+ * ("4.5 apoia 2 leitos do 4.2"), e todos já valem nas colunas "Com a recomendação".
  */
 export function Recomendacao(props: PropsRecomendacao) {
   const { painel, lista, temDados, completo, aviso } = props;

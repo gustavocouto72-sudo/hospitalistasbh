@@ -1,7 +1,16 @@
 'use client';
 
 import { useId, useState } from 'react';
-import type { Ajustes, Apoio, ContagemDoPosto, Contagens, Painel, SetorNoPainel } from '@/calculo/tipos';
+import type {
+  Ajustes,
+  Apoio,
+  ContagemDoPosto,
+  Contagens,
+  Painel,
+  PainelComApoios,
+  SetorComApoio,
+  SetorNoPainel,
+} from '@/calculo/tipos';
 import { textos } from '@/textos';
 import { nomeDoSetor } from './apoios-dia';
 import {
@@ -23,7 +32,7 @@ export type PropsPlanilha = {
   /** Painel sem apoio. */
   readonly painel: Painel;
   /** O mesmo painel com a recomendação aplicada. */
-  readonly comApoio: Painel;
+  readonly comApoio: PainelComApoios;
   readonly apoios: readonly Apoio[];
   /** `false` antes do relatório: a planilha mostra só o quadro de médicos. */
   readonly temDados: boolean;
@@ -73,7 +82,7 @@ export function Planilha(props: PropsPlanilha) {
                 {t.grupoSemApoio}
               </th>
               <th
-                colSpan={2}
+                colSpan={3}
                 scope="colgroup"
                 className="border-l-2 border-tinta px-3 pt-2.5 text-left text-nota font-semibold text-tinta"
               >
@@ -109,7 +118,10 @@ export function Planilha(props: PropsPlanilha) {
                 {t.colunas.situacao}
               </th>
               <th scope="col" className={`${TH} ${NUM} border-l-2 border-tinta`}>
-                {t.colunas.comApoio}
+                {t.colunas.pacientes}
+              </th>
+              <th scope="col" className={`${TH} ${NUM}`}>
+                {t.colunas.porMedico}
               </th>
               <th scope="col" className={TH}>
                 {t.colunas.situacao}
@@ -118,7 +130,8 @@ export function Planilha(props: PropsPlanilha) {
           </thead>
           <tbody>
             {painel.setores.map((setor) => {
-              const depois = comApoio.setores.find((s) => s.id === setor.id) ?? setor;
+              const depois = comApoio.setores.find((s) => s.id === setor.id);
+              if (!depois) return null;
               return <Linha key={setor.id} {...props} setor={setor} depois={depois} />;
             })}
           </tbody>
@@ -129,7 +142,9 @@ export function Planilha(props: PropsPlanilha) {
               </th>
               <td className={`${TD} text-center ${NUM}`}>{c.numero(medicosDaEscala(painel))}</td>
               <td className={`${TD} text-center ${NUM}`}>{residentes(painel) > 0 ? residentes(painel) : ''}</td>
-              <td className={`${TD} ${NUM}`}>{temDados ? c.numero(totalDe(painel, 'hospitalistas')) : '—'}</td>
+              <td data-coluna="pacientes" className={`${TD} ${NUM}`}>
+                {temDados ? c.numero(totalDe(painel, 'hospitalistas')) : '—'}
+              </td>
               <td className={`${TD} ${NUM} ${SECUNDARIA} text-tinta-suave`}>
                 {temDados ? c.numero(totalDe(painel, 'cardioGeriatria')) : '—'}
               </td>
@@ -139,7 +154,10 @@ export function Planilha(props: PropsPlanilha) {
               <td className={`${TD} ${NUM} border-l border-linha`}>{t.media(media)}</td>
               <td className={`${TD} ${SECUNDARIA}`} />
               <td className={TD} />
-              <td className={`${TD} ${NUM} border-l-2 border-tinta`}>{t.media(media)}</td>
+              <td data-coluna="pacientes-com-apoio" className={`${TD} ${NUM} border-l-2 border-tinta`}>
+                {temDados ? c.numero(comApoio.setores.reduce((soma, s) => soma + s.pacientes, 0)) : '—'}
+              </td>
+              <td className={`${TD} ${NUM}`}>{t.media(media)}</td>
               <td className={TD} />
             </tr>
           </tfoot>
@@ -154,7 +172,7 @@ function totalDe(painel: Painel, campo: Campo): number {
   return painel.setores.reduce((soma, s) => soma + s.contagens[campo], 0);
 }
 
-function Linha(props: PropsPlanilha & { readonly setor: SetorNoPainel; readonly depois: SetorNoPainel }) {
+function Linha(props: PropsPlanilha & { readonly setor: SetorNoPainel; readonly depois: SetorComApoio }) {
   const { setor, depois, painel, temDados, editando, fonte, apoios, postos, ajustes, aoAjustarContagem } = props;
   const propria = setor.estado === 'escalaPropria';
   const notas = temDados && fonte !== 'nenhuma' ? notasDoSetor(painel, setor, fonte) : [];
@@ -196,6 +214,7 @@ function Linha(props: PropsPlanilha & { readonly setor: SetorNoPainel; readonly 
       {CAMPOS.map((campo) => (
         <td
           key={campo}
+          data-coluna={campo === 'hospitalistas' ? 'pacientes' : undefined}
           className={`${TD} ${NUM} ${campo === 'hospitalistas' ? 'text-corpo font-semibold' : ''} ${
             campo === 'cardioGeriatria' ? 'text-tinta-suave' : ''
           } ${campo === 'potenciaisAdmissoes' ? 'text-admissao' : ''} ${campo === 'hospitalistas' ? '' : SECUNDARIA}`}
@@ -244,14 +263,19 @@ function Linha(props: PropsPlanilha & { readonly setor: SetorNoPainel; readonly 
         {temDados && setor.diferenca !== null ? c.diferenca(setor.diferenca) : ''}
       </td>
       <Situacao coluna="situacao" setor={setor} temDados={temDados} />
-      <td data-coluna="com-apoio" className={`${TD} ${NUM} border-l-2 border-tinta`}>
+      <td data-coluna="pacientes-com-apoio" className={`${TD} ${NUM} border-l-2 border-tinta`}>
         <span className="flex items-baseline justify-end gap-2">
           {notasApoio.length > 0 ? (
             <span className="text-nota whitespace-nowrap text-tinta-suave">{notasApoio.join(' · ')}</span>
           ) : null}
-          <span data-valor="" className="text-corpo font-bold">
-            {porMedicoDe(depois, temDados)}
+          <span data-valor="" className="text-corpo font-semibold">
+            {temDados ? c.numero(depois.pacientes) : '—'}
           </span>
+        </span>
+      </td>
+      <td data-coluna="com-apoio" className={`${TD} ${NUM}`}>
+        <span data-valor="" className="text-corpo font-bold">
+          {porMedicoDe(depois, temDados)}
         </span>
       </td>
       <Situacao coluna="situacao-com-apoio" setor={depois} temDados={temDados} />

@@ -14,7 +14,7 @@
  */
 import { aplicarApoios } from '@/calculo/aplicar-apoios';
 import { sugerirApoios, type SugestaoDeApoio } from '@/calculo/sugerir-apoios';
-import type { Apoio, Painel, SetorNoPainel } from '@/calculo/tipos';
+import type { Apoio, Painel, PainelComApoios, SetorNoPainel } from '@/calculo/tipos';
 import { textos } from '@/textos';
 
 export type EstadoApoios = {
@@ -89,7 +89,7 @@ export function apoiosEmVigor(lista: readonly ItemDaLista[]): Apoio[] {
 }
 
 /** O painel com os apoios em vigor aplicados. */
-export function painelComApoio(painel: Painel, lista: readonly ItemDaLista[]): Painel {
+export function painelComApoio(painel: Painel, lista: readonly ItemDaLista[]): PainelComApoios {
   return aplicarApoios(painel, apoiosEmVigor(lista));
 }
 

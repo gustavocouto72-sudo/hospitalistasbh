@@ -57,4 +57,9 @@
     - Com relatório ou à mão, o campo de pacientes de cada posto fica aberto na planilha. Número diferente do relatório mostra "relatório: N" embaixo; setor com dois postos mostra a soma.
     - O botão de editar passa a abrir só cardio/geri e potenciais admissões, e some no celular, onde essas colunas não aparecem.
   - Falta: rodar o Playwright (`pnpm e2e`) no Mac e publicar com `vercel deploy --prod`. Feito fora do Claude Code, sem navegador do Playwright na sessão; a tela foi conferida por captura no desktop e no celular.
+- [x] **T-05.9 — Pacientes na parte "Com a recomendação" (pedido do dono, 19/11/2026)**
+  - Pedido do dono: ver, além da carga por médico, o número de pacientes de cada setor depois do apoio.
+  - Aceite:
+    - O grupo "Com a recomendação" tem Pacientes, Por médico e Situação. Pacientes é o número real (sem o peso 1,25): o apoiado perde os leitos cedidos e o apoiador ganha os recebidos.
+    - As notas "apoia 4.2 (1)" e "apoio do 4.5 (1)" ficam ao lado dos pacientes, e o total da coluna é igual ao total sem apoio.
 

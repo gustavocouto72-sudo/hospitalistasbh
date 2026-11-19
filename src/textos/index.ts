@@ -109,7 +109,6 @@ export const textos = {
       porMedico: 'Por médico',
       diferenca: 'vs. média',
       situacao: 'Situação',
-      comApoio: 'Com apoio',
     },
     grupoSemApoio: 'Sem apoio',
     grupoComApoio: 'Com a recomendação',
@@ -140,7 +139,7 @@ export const textos = {
     nenhuma: 'Nenhum apoio necessário: todos os setores estão na média.',
     semMedia: 'Sem média do dia, não há recomendação.',
     semDados: 'A recomendação aparece depois do relatório.',
-    nota: 'Já aplicada na coluna “Com apoio”. Edite os leitos, troque quem apoia ou remova.',
+    nota: 'Já aplicada nas colunas “Com a recomendação”. Edite os leitos, troque quem apoia ou remova.',
   },
   resumo: {
     titulo: 'Resumo do dia',

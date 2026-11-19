@@ -165,6 +165,26 @@ describe('Página — Testing Library', () => {
     expect(comApoio(container, para)).toBe(antes);
   });
 
+  it('mostra os pacientes com apoio: o apoiado perde os leitos, o apoiador ganha, e o total não muda', async () => {
+    const { container } = await subirFixture();
+    const pacientesAntes = (setor: string) =>
+      Array.from(celula(container, setor, 'pacientes').querySelectorAll('input')).reduce(
+        (soma, campo) => soma + Number(campo.value),
+        0,
+      );
+    const pacientesDepois = (setor: string) =>
+      Number(celula(container, setor, 'pacientes-com-apoio').querySelector('[data-valor]')?.textContent);
+    const [primeiro] = itensDeApoio(container);
+    if (!primeiro) throw new Error('sem apoio sugerido');
+    const [de, para] = (primeiro.dataset.apoio ?? '').split('→') as [string, string];
+    const leitos = pacientesAntes(para) - pacientesDepois(para);
+    expect(leitos).toBeGreaterThan(0);
+    expect(pacientesDepois(de)).toBeGreaterThan(pacientesAntes(de));
+    const total = container.querySelector('main tfoot [data-coluna="pacientes-com-apoio"]')?.textContent;
+    const totalAntes = container.querySelector('main tfoot [data-coluna="pacientes"]')?.textContent;
+    expect(total).toBe(totalAntes);
+  });
+
   it('mais um leito no apoio muda a coluna "Com apoio" do apoiado', async () => {
     const { usuario, container } = await subirFixture();
     const [primeiro] = itensDeApoio(container);
