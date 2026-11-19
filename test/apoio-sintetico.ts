@@ -5,7 +5,7 @@
 import { expect } from 'vitest';
 import { aplicarApoios } from '../src/calculo/aplicar-apoios';
 import { calcularCarga } from '../src/calculo/calcular-carga';
-import { corDoSetor } from '../src/calculo/semaforo';
+import { MARGEM_DO_VERDE, corDoSetor } from '../src/calculo/semaforo';
 import type { Apoio, ModoSetor, Painel, PainelComApoios, QuadroMontado } from '../src/calculo/tipos';
 
 export type SetorSintetico = { id: string; carga: number; medicos: number; modo?: ModoSetor };
@@ -78,7 +78,7 @@ export function conferirRestricoes(antes: Painel, apoios: readonly Apoio[]): Pai
   for (const s of depois.setores) {
     if (s.leitosRecebidos > 0) {
       expect(s.estado).toBe('calculado');
-      expect(s.diferenca as number).toBeLessThanOrEqual(1);
+      expect(s.diferenca as number).toBeLessThanOrEqual(MARGEM_DO_VERDE);
     }
     if (s.estado === 'escalaPropria') expect(s.leitosCedidos + s.leitosRecebidos).toBe(0);
     expect(s.leitosCedidos).toBeLessThanOrEqual(s.antes.carga);

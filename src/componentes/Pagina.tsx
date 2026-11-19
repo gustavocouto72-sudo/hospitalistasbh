@@ -71,7 +71,8 @@ export function Pagina() {
   const [entrada, setEntrada] = useState(ENTRADA_INICIAL);
   // Apoios editados, trocados, removidos e adicionados. Valem para o quadro e a fonte em uso.
   const [apoios, setApoios] = useState(APOIOS_INICIAL);
-  // Campos de contagem por posto abertos na planilha. No preenchimento à mão, abrem sozinhos.
+  // Campos de cardio/geri e potenciais admissões abertos na planilha; no preenchimento à mão, abrem sozinhos.
+  // Os pacientes dos hospitalistas ficam sempre editáveis, com relatório ou à mão.
   const [editando, setEditando] = useState(false);
   // Só a última leitura pedida vale: um arquivo lento não sobrescreve outro escolhido depois.
   const ultimaLeitura = useRef(0);

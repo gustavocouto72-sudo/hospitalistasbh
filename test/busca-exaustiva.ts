@@ -20,7 +20,7 @@
  * `aplicarApoios` e `corDoSetor`, e a contagem é conferida contra a deles.
  */
 import { aplicarApoios } from '../src/calculo/aplicar-apoios';
-import { corDoSemaforo, corDoSetor } from '../src/calculo/semaforo';
+import { MARGEM_DO_VERDE, corDoSemaforo, corDoSetor } from '../src/calculo/semaforo';
 import { PESO_DO_APOIO, type Apoio, type Painel, type PainelComApoios } from '../src/calculo/tipos';
 
 export type Custo = {
@@ -168,7 +168,7 @@ export function buscaExaustiva(painel: Painel, opcoes: OpcoesBusca = {}): Result
     const { de, para } = escolhidos[k] as Par;
     for (let l = 1; ; l++) {
       if ((cedidos[para] as number) + l > (carga[para] as number)) break;
-      if (diferencaDoApoiador(de, (recebidos[de] as number) + l) > 1) break;
+      if (diferencaDoApoiador(de, (recebidos[de] as number) + l) > MARGEM_DO_VERDE) break;
       cedidos[para] = (cedidos[para] as number) + l;
       recebidos[de] = (recebidos[de] as number) + l;
       leitos.push(l);

@@ -87,11 +87,11 @@ describe('painelDoDia', () => {
   it('recalcula na hora quando os médicos mudam', () => {
     const antes = painelDoDia(POSTOS, 'semana', ESTADO_INICIAL.ajustes);
     expect(corDe(setor(antes, '4.3'))).toBe('vermelho');
-    // De 2 para 4 médicos: 30 ÷ 4 = 7,5 contra a média de 120 ÷ 20 = 6.
+    // De 2 para 3,5 médicos: 30 ÷ 3,5 ≈ 8,6 contra a média de 120 ÷ 19,5 ≈ 6,2.
     let ajustado = ESTADO_INICIAL;
-    for (const atual of [2, 2.5, 3, 3.5]) ajustado = ajustarMedicos(ajustado, '4.3', atual, 1);
+    for (const atual of [2, 2.5, 3]) ajustado = ajustarMedicos(ajustado, '4.3', atual, 1);
     const depois = painelDoDia(POSTOS, 'semana', ajustado.ajustes);
-    expect(setor(depois, '4.3').medicos).toBe(4);
+    expect(setor(depois, '4.3').medicos).toBe(3.5);
     expect(corDe(setor(depois, '4.3'))).toBe('amarelo');
   });
 

@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest';
 import { aplicarApoios } from '../src/calculo/aplicar-apoios';
 import { calcularCarga } from '../src/calculo/calcular-carga';
 import { montarQuadro } from '../src/calculo/montar-quadro';
-import { corDoSetor } from '../src/calculo/semaforo';
+import { MARGEM_DO_VERDE, corDoSetor } from '../src/calculo/semaforo';
 import type { Apoio, ContagemDoPosto, ModoSetor, Painel, QuadroMontado } from '../src/calculo/tipos';
 import { buscaExaustiva, compararCustos, custoDe, foraDoVerde, type Custo } from './busca-exaustiva';
 
@@ -75,7 +75,7 @@ function conferirRestricoes(antes: Painel, apoios: readonly Apoio[], maxApoios =
   for (const s of depois.setores) {
     if (s.leitosRecebidos > 0) {
       expect(s.estado).toBe('calculado');
-      expect(s.diferenca as number).toBeLessThanOrEqual(1);
+      expect(s.diferenca as number).toBeLessThanOrEqual(MARGEM_DO_VERDE);
     }
     if (s.estado === 'escalaPropria') expect(s.leitosCedidos + s.leitosRecebidos).toBe(0);
     expect(s.leitosCedidos).toBeLessThanOrEqual(s.antes.carga);
@@ -133,7 +133,7 @@ function buscaIngenua(antes: Painel, max: number): { apoios: Apoio[]; custo: Cus
       if (pares.size === lista.length) {
         try {
           const depois = aplicarApoios(antes, lista);
-          const ok = depois.setores.every((s) => s.leitosRecebidos === 0 || (s.diferenca as number) <= 1);
+          const ok = depois.setores.every((s) => s.leitosRecebidos === 0 || (s.diferenca as number) <= MARGEM_DO_VERDE);
           if (ok) {
             const custo = custoDe(depois, lista, ids);
             if (compararCustos(custo, melhor.custo) < 0) melhor = { apoios: [...lista], custo };

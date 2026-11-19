@@ -65,13 +65,13 @@ As contagens chegam por posto, mas a equipe trabalha por setor, e o agrupamento 
 
 | Faixa | Cor |
 |---|---|
-| d < −2 | `azulEscuro` |
-| −2 ≤ d < −1 | `azulClaro` |
-| −1 ≤ d ≤ +1 | `verde` |
-| +1 < d ≤ +2 | `amarelo` |
-| d > +2 ou `semMedico` | `vermelho` |
+| d < −2,5 | `azulEscuro` |
+| −2,5 ≤ d < −1,5 | `azulClaro` |
+| −1,5 ≤ d ≤ +1,5 | `verde` |
+| +1,5 < d ≤ +2,5 | `amarelo` |
+| d > +2,5 ou `semMedico` | `vermelho` |
 
-Os valores exatamente em ±1 e ±2 caem na faixa mais próxima do verde.
+Os valores exatamente em ±1,5 e ±2,5 caem na faixa mais próxima do verde. (Até 19/11/2026 as faixas eram ±1 e ±2; o dono pediu mais tolerância.)
 
 ## Regras e invariantes
 
@@ -107,6 +107,6 @@ A média é 174 ÷ 18 = 9,67.
 
 - A tabela acima como teste de aceitação.
 - O mesmo para o fim de semana, com a carga do 3.1 + 6.1 = 18.
-- Fronteiras do semáforo: −2, −1, +1, +2 e valores logo acima e abaixo de cada uma.
+- Fronteiras do semáforo: −2,5, −1,5, +1,5, +2,5 e valores logo acima e abaixo de cada uma.
 - Setor sem médico, posto oculto, posto novo com pacientes, ajuste de médicos e Σ médicos = 0.
 - Teste de propriedade: Σ carga dos setores = Σ `hospitalistas` dos postos.

@@ -66,8 +66,8 @@ describe.each(FIXTURES)('T-04.4 — amostra de 12/11/2026, semana (%s)', (arquiv
     const p = await painelDaAmostra(arquivo);
     const r = sugerirApoios(p);
     expect(r.apoios).toEqual([
-      { de: '4.5', para: '4.2', leitos: 2 },
-      { de: '6.1', para: '4.3', leitos: 2 },
+      { de: '4.5', para: '4.2', leitos: 1 },
+      { de: '6.1', para: '4.3', leitos: 1 },
     ]);
     expect(r.apoios).toEqual(buscaExaustiva(p).apoios);
   });
@@ -126,9 +126,9 @@ describe('T-04.4 — casos de aceitação sintéticos', () => {
 
   it('sem solução toda no verde: devolve a melhor, marca completo: false e avisa', () => {
     const p = painel([
-      { id: 'A', carga: 30, medicos: 1 },
-      { id: 'B', carga: 10, medicos: 2 },
-      { id: 'C', carga: 10, medicos: 2 },
+      { id: 'A', carga: 40, medicos: 1 },
+      { id: 'B', carga: 5, medicos: 2 },
+      { id: 'C', carga: 5, medicos: 2 },
     ]);
     const r = sugerirApoios(p);
     expect(r.completo).toBe(false);
@@ -182,14 +182,8 @@ describe('T-04.4 — guloso × busca exaustiva em painéis aleatórios pequenos'
    * primeiro critério em que perde. Em nenhum ele perde mais de um setor fora do verde.
    */
   const DIVERGENCIAS: Record<number, Criterio> = {
-    5110: 'ordemDoQuadro',
-    5151: 'leitos',
-    5213: 'leitos',
-    5236: 'leitos',
-    5254: 'foraDoVerde',
-    5267: 'leitos',
+    5262: 'leitos',
     5275: 'leitos',
-    5281: 'leitos',
   };
 
   const resultados = SEMENTES.map((semente) => {

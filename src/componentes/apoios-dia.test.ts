@@ -178,8 +178,8 @@ describe('painelComApoio', () => {
 
 describe('sugestaoDoDia', () => {
   it('avisa quando nem todos os setores cabem no verde', () => {
-    // Média 10: o 4.3 precisa ceder 19 leitos, e o 4.4 e o 4.5 aguentam só 9 cada um.
-    const p = painelDoDia([posto('4.3', 30), posto('4.4', 10), posto('4.5', 10)], 'semana', {
+    // Média 10: o 4.3 precisa ceder 29 leitos, e o 4.4 e o 4.5 aguentam só 14 cada um.
+    const p = painelDoDia([posto('4.3', 40), posto('4.4', 5), posto('4.5', 5)], 'semana', {
       medicos: { '2': 0, '4.2': 0, '6.1': 0, '6.2': 0, '6.3': 0, '4.3': 1, '4.4': 2, '4.5': 2 },
     });
     const s = sugestaoDoDia(p);

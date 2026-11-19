@@ -66,9 +66,8 @@ for (const fixture of FIXTURES) {
     const linha = page.locator('main tr[data-setor="4.3"]');
     await linha.getByRole('button', { name: textos.cartao.maisMedico('4.3') }).click();
     await linha.getByRole('button', { name: textos.cartao.menosMedico('4.3') }).click();
-    await page.getByRole('button', { name: textos.planilha.editar }).click();
+    // O campo de pacientes fica aberto depois de subir o relatório, no celular e no desktop.
     await page.getByRole('textbox', { name: textos.cartao.campo.hospitalistas('4.3') }).fill('24');
-    await page.getByRole('button', { name: textos.planilha.pronto }).click();
     await page
       .getByRole('button', { name: /^Pôr um leito: / })
       .first()

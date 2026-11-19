@@ -10,7 +10,7 @@
  *    de (índice do apoiado, índice do apoiador, leitos).
  *
  * Restrições: leitos inteiros ≥ 1; um par (apoiador, apoiado) aparece no máximo uma vez; o apoiador tem médico
- * e termina com diferença ≤ +1; nenhum setor apoia e é apoiado; `escalaPropria` não participa; ninguém cede
+ * e termina no verde (diferença ≤ `MARGEM_DO_VERDE`); nenhum setor apoia e é apoiado; `escalaPropria` não participa; ninguém cede
  * mais leitos do que tem.
  *
  * Algoritmo: uma busca gulosa (o setor mais sobrecarregado recebe apoio do setor com mais folga, com o mínimo
@@ -23,7 +23,7 @@
  */
 import { textos } from '../textos';
 import { aplicarApoios } from './aplicar-apoios';
-import { corDoSemaforo, corDoSetor } from './semaforo';
+import { MARGEM_DO_VERDE, corDoSemaforo, corDoSetor } from './semaforo';
 import { PESO_DO_APOIO, type Apoio, type Painel, type PainelComApoios } from './tipos';
 
 export type OpcoesSugestao = {
@@ -124,7 +124,7 @@ export function sugerirApoios(painel: Painel, opcoes: OpcoesSugestao = {}): Suge
       if (!participa[i]) continue;
       if ((medicos[i] as number) > 0) {
         const d = diferenca(i, ced, rec);
-        if (rec > 0 && d > 1) return null;
+        if (rec > 0 && d > MARGEM_DO_VERDE) return null;
         if (corDoSemaforo(d) !== 'verde') fora++;
         const cargaPorMedico = ((carga[i] as number) - ced + PESO_DO_APOIO * rec) / (medicos[i] as number);
         if (cargaPorMedico > maior) maior = cargaPorMedico;
@@ -141,10 +141,10 @@ export function sugerirApoios(painel: Painel, opcoes: OpcoesSugestao = {}): Suge
     return { foraDoVerde: fora, apoios: itens.length, leitos, maiorCargaPorMedico: maior, chave };
   };
 
-  /** Quantos leitos o apoiador `de` ainda aguenta sem passar de +1. */
+  /** Quantos leitos o apoiador `de` ainda aguenta sem sair do verde. */
   const folga = (de: number, recebidos: number) => {
     let l = 0;
-    while (diferenca(de, 0, recebidos + l + 1) <= 1) l++;
+    while (diferenca(de, 0, recebidos + l + 1) <= MARGEM_DO_VERDE) l++;
     return l;
   };
 
@@ -204,7 +204,7 @@ export function sugerirApoios(painel: Painel, opcoes: OpcoesSugestao = {}): Suge
         if (!podeSerApoiado[i] || desistidos.has(i) || (recebidos[i] as number) > 0) continue;
         const resta = (carga[i] as number) - (cedidos[i] as number);
         if (resta <= 0) continue;
-        if ((medicos[i] as number) > 0 && diferenca(i, cedidos[i] as number, 0) <= 1) continue;
+        if ((medicos[i] as number) > 0 && diferenca(i, cedidos[i] as number, 0) <= MARGEM_DO_VERDE) continue;
         if (apoiado < 0 || cargaPorMedico(i) > cargaPorMedico(apoiado)) apoiado = i;
       }
       if (apoiado < 0) return itens;
@@ -213,7 +213,8 @@ export function sugerirApoios(painel: Painel, opcoes: OpcoesSugestao = {}): Suge
       let precisa = resta;
       if ((medicos[apoiado] as number) > 0) {
         precisa = 1;
-        while (precisa < resta && diferenca(apoiado, (cedidos[apoiado] as number) + precisa, 0) > 1) precisa++;
+        while (precisa < resta && diferenca(apoiado, (cedidos[apoiado] as number) + precisa, 0) > MARGEM_DO_VERDE)
+          precisa++;
       }
 
       let apoiador = -1;

@@ -21,11 +21,11 @@ carga.
 
   | Diferença | Cor |
   | --- | --- |
-  | abaixo de −2 | azul-escuro |
-  | de −2 até −1 | azul-claro |
-  | de −1 a +1 | verde |
-  | de +1 até +2 | amarelo |
-  | acima de +2, ou setor sem médico | vermelho |
+  | abaixo de −2,5 | azul-escuro |
+  | de −2,5 até −1,5 | azul-claro |
+  | de −1,5 a +1,5 | verde |
+  | de +1,5 até +2,5 | amarelo |
+  | acima de +2,5, ou setor sem médico | vermelho |
 
 - **Apoio:** o leito apoiado pesa 1,25 para quem apoia e sai inteiro do setor apoiado. A sugestão busca
   o menor número de setores fora do verde, depois o menor número de apoios e de leitos.

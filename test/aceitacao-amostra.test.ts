@@ -67,7 +67,7 @@ const FIM_DE_SEMANA: Linha[] = [
   { setor: '6.2', carga: 26, medicos: 1, porMedico: 26, cor: 'vermelho' },
   { setor: '4.3', carga: 23, medicos: 1, porMedico: 23, cor: 'verde' },
   { setor: '6.3', carga: 22, medicos: 1, porMedico: 22, cor: 'verde' },
-  { setor: '4.4', carga: 20, medicos: 1, porMedico: 20, cor: 'azulEscuro' },
+  { setor: '4.4', carga: 20, medicos: 1, porMedico: 20, cor: 'azulClaro' },
   { setor: '3.1 + 6.1', carga: 18, medicos: 1, porMedico: 18, cor: 'azulEscuro' },
   { setor: '4.5', carga: 16, medicos: 1, porMedico: 16, cor: 'azulEscuro' },
 ];

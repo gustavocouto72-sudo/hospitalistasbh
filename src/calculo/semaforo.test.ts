@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { calcularCarga } from './calcular-carga';
 import { montarQuadro } from './montar-quadro';
-import { CORES_DO_SEMAFORO, corDoSemaforo, corDoSetor } from './semaforo';
+import { CORES_DO_SEMAFORO, MARGEM_DO_AMARELO, MARGEM_DO_VERDE, corDoSemaforo, corDoSetor } from './semaforo';
 import type { ContagemDoPosto, SetorNoPainel } from './tipos';
 
 const EPS = 1e-9;
@@ -13,29 +13,32 @@ describe('corDoSemaforo', () => {
 
   it.each([
     [-10, 'azulEscuro'],
-    [-2 - EPS, 'azulEscuro'],
+    [-2.5 - EPS, 'azulEscuro'],
+    [-2.5, 'azulClaro'],
+    [-2.5 + EPS, 'azulClaro'],
     [-2, 'azulClaro'],
-    [-2 + EPS, 'azulClaro'],
-    [-1.5, 'azulClaro'],
-    [-1 - EPS, 'azulClaro'],
+    [-1.5 - EPS, 'azulClaro'],
+    [-1.5, 'verde'],
+    [-1.5 + EPS, 'verde'],
     [-1, 'verde'],
-    [-1 + EPS, 'verde'],
     [0, 'verde'],
     [-0, 'verde'],
-    [1 - EPS, 'verde'],
     [1, 'verde'],
-    [1 + EPS, 'amarelo'],
-    [1.5, 'amarelo'],
-    [2 - EPS, 'amarelo'],
+    [1.5 - EPS, 'verde'],
+    [1.5, 'verde'],
+    [1.5 + EPS, 'amarelo'],
     [2, 'amarelo'],
-    [2 + EPS, 'vermelho'],
+    [2.5 - EPS, 'amarelo'],
+    [2.5, 'amarelo'],
+    [2.5 + EPS, 'vermelho'],
     [10, 'vermelho'],
   ] as const)('diferença %d → %s', (diferenca, cor) => {
     expect(corDoSemaforo(diferenca)).toBe(cor);
   });
 
-  it('valores exatamente em ±1 e ±2 caem na faixa mais próxima do verde', () => {
-    expect([-2, -1, 1, 2].map(corDoSemaforo)).toEqual(['azulClaro', 'verde', 'verde', 'amarelo']);
+  it('valores exatamente em ±1,5 e ±2,5 caem na faixa mais próxima do verde', () => {
+    expect([-2.5, -1.5, 1.5, 2.5].map(corDoSemaforo)).toEqual(['azulClaro', 'verde', 'verde', 'amarelo']);
+    expect([MARGEM_DO_VERDE, MARGEM_DO_AMARELO]).toEqual([1.5, 2.5]);
   });
 
   it('carga por médico infinita (setor sem médico) é vermelho', () => {

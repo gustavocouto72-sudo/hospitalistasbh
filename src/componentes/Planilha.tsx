@@ -27,7 +27,10 @@ export type PropsPlanilha = {
   readonly apoios: readonly Apoio[];
   /** `false` antes do relatório: a planilha mostra só o quadro de médicos. */
   readonly temDados: boolean;
-  /** Campos de contagem por posto abertos para edição. */
+  /**
+   * Cardio/geri e potenciais admissões abertos para edição. Os pacientes dos hospitalistas ficam sempre
+   * editáveis depois que há dados: o relatório preenche, e a equipe corrige o número no lugar.
+   */
   readonly editando: boolean;
   readonly fonte: 'relatorio' | 'manual' | 'nenhuma';
   readonly postos: readonly ContagemDoPosto[];
@@ -157,6 +160,8 @@ function Linha(props: PropsPlanilha & { readonly setor: SetorNoPainel; readonly 
   const notas = temDados && fonte !== 'nenhuma' ? notasDoSetor(painel, setor, fonte) : [];
   const notasApoio = temDados ? notasCurtas(painel, apoios, setor.id) : [];
   const porPosto = contagensDosPostos(postos, ajustes, setor.postos);
+  // O que o relatório trouxe em cada posto, para mostrar ao lado do número corrigido à mão.
+  const doRelatorio = new Map(fonte === 'relatorio' ? postos.map((p) => [p.codigo, p.hospitalistas]) : []);
 
   return (
     <tr data-setor={setor.id} className="border-b border-linha last:border-b-0 hover:bg-pagina/60">
@@ -195,18 +200,35 @@ function Linha(props: PropsPlanilha & { readonly setor: SetorNoPainel; readonly 
             campo === 'cardioGeriatria' ? 'text-tinta-suave' : ''
           } ${campo === 'potenciaisAdmissoes' ? 'text-admissao' : ''} ${campo === 'hospitalistas' ? '' : SECUNDARIA}`}
         >
-          {editando ? (
+          {temDados && (editando || campo === 'hospitalistas') ? (
             <div className="flex flex-col items-end gap-1">
-              {porPosto.map((p) => (
-                <label key={p.codigo} className="flex items-center gap-1.5">
-                  {porPosto.length > 1 ? <span className="text-nota text-tinta-suave">{p.codigo}</span> : null}
-                  <CampoContagem
-                    valor={p[campo]}
-                    rotulo={c.campo[campo](p.codigo)}
-                    aoMudar={(valor) => aoAjustarContagem(p.codigo, campo, valor)}
-                  />
-                </label>
-              ))}
+              {porPosto.map((p) => {
+                const original = campo === 'hospitalistas' ? doRelatorio.get(p.codigo) : undefined;
+                return (
+                  <div key={p.codigo} className="flex flex-col items-end">
+                    <label className="flex items-center gap-1.5">
+                      {porPosto.length > 1 ? (
+                        <span className="text-nota font-normal text-tinta-suave">{p.codigo}</span>
+                      ) : null}
+                      <CampoContagem
+                        valor={p[campo]}
+                        rotulo={c.campo[campo](p.codigo)}
+                        aoMudar={(valor) => aoAjustarContagem(p.codigo, campo, valor)}
+                      />
+                    </label>
+                    {original !== undefined && original !== p[campo] ? (
+                      <span data-ajustado="" className="text-nota font-normal whitespace-nowrap text-tinta-suave">
+                        {t.noRelatorio(original)}
+                      </span>
+                    ) : null}
+                  </div>
+                );
+              })}
+              {campo === 'hospitalistas' && porPosto.length > 1 ? (
+                <span data-soma="" className="text-nota font-normal whitespace-nowrap text-tinta-suave">
+                  {t.somaDoSetor(c.numero(setor.contagens[campo]))}
+                </span>
+              ) : null}
             </div>
           ) : temDados ? (
             c.numero(setor.contagens[campo])

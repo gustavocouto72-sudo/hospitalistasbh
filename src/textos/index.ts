@@ -1,3 +1,4 @@
+import { MARGEM_DO_AMARELO, MARGEM_DO_VERDE } from '../calculo/semaforo';
 import type { MotivoContagemInvalida } from '../relatorio/numeros';
 
 const DATA_POR_EXTENSO = new Intl.DateTimeFormat('pt-BR', {
@@ -17,6 +18,8 @@ const COM_SINAL = new Intl.NumberFormat('pt-BR', {
 
 /** Número com uma casa decimal, no máximo: "6,7", "18", "2,5". */
 const numero = (valor: number) => NUMERO.format(valor);
+/** Limites das faixas do semáforo, como aparecem na legenda: "1,5" e "2,5". */
+const MARGENS = { verde: numero(MARGEM_DO_VERDE), amarelo: numero(MARGEM_DO_AMARELO) };
 
 const MOTIVO: Record<MotivoContagemInvalida, string> = {
   vazio: 'está vazio',
@@ -113,7 +116,9 @@ export const textos = {
     total: 'Total',
     media: (valor: string) => `média ${valor}`,
     semDados: 'Suba o relatório 9998 ou preencha à mão para ver a carga de cada setor.',
-    editar: 'Editar contagens',
+    editar: 'Editar cardio/geri e admissões',
+    noRelatorio: (valor: number) => `relatório: ${valor}`,
+    somaDoSetor: (valor: string) => `soma ${valor}`,
     pronto: 'Pronto',
     escalaPropria: 'Escala própria',
     residenteNo: (setor: string) => `Residente no ${setor}`,
@@ -123,11 +128,11 @@ export const textos = {
   legenda: {
     titulo: 'Legenda do semáforo',
     faixa: {
-      azulEscuro: '(< −2)',
-      azulClaro: '(−2 a −1)',
-      verde: '(±1)',
-      amarelo: '(+1 a +2)',
-      vermelho: '(> +2)',
+      azulEscuro: `(< −${MARGENS.amarelo})`,
+      azulClaro: `(−${MARGENS.amarelo} a −${MARGENS.verde})`,
+      verde: `(±${MARGENS.verde})`,
+      amarelo: `(+${MARGENS.verde} a +${MARGENS.amarelo})`,
+      vermelho: `(> +${MARGENS.amarelo})`,
     },
   },
   recomendacao: {

@@ -114,15 +114,42 @@ describe('Página — Testing Library', () => {
     expect(screen.queryByRole('checkbox', { name: textos.planilha.residenteNo('3.1') })).toBeNull();
   });
 
-  it('editar as contagens abre os campos por posto e recalcula', async () => {
+  it('depois de importar, os pacientes de cada posto já podem ser corrigidos, com o número do relatório ao lado', async () => {
     const { usuario, container } = await subirFixture();
-    await usuario.click(screen.getByRole('button', { name: textos.planilha.editar }));
-    const campo = screen.getByRole('textbox', { name: textos.cartao.campo.hospitalistas('4.3') });
+    const campo = screen.getByRole<HTMLInputElement>('textbox', { name: textos.cartao.campo.hospitalistas('4.3') });
+    expect(campo.value).toBe('23');
+    expect(linha(container, '4.3').querySelector('[data-ajustado]')).toBeNull();
     await usuario.clear(campo);
-    await usuario.type(campo, '30');
-    expect(porMedico(container, '4.3')).toBe('15');
+    await usuario.type(campo, '21');
+    // 21 pacientes com 2 médicos, contra 172 ÷ 18 de média.
+    expect(porMedico(container, '4.3')).toBe('10,5');
+    expect(container.querySelector('header dl')?.textContent).toContain(`${textos.resumo.pacientes}172`);
+    expect(linha(container, '4.3').querySelector('[data-ajustado]')?.textContent).toBe(textos.planilha.noRelatorio(23));
+    // Voltar ao número do relatório tira a nota.
+    await usuario.clear(campo);
+    await usuario.type(campo, '23');
+    expect(linha(container, '4.3').querySelector('[data-ajustado]')).toBeNull();
+  });
+
+  it('setor com dois postos mostra um campo por posto e a soma do setor', async () => {
+    const { usuario, container } = await subirFixture();
+    expect(linha(container, '2').querySelector('[data-soma]')?.textContent).toBe(textos.planilha.somaDoSetor('27'));
+    const campo = screen.getByRole('textbox', { name: textos.cartao.campo.hospitalistas('2.1') });
+    await usuario.clear(campo);
+    await usuario.type(campo, '12');
+    expect(linha(container, '2').querySelector('[data-soma]')?.textContent).toBe(textos.planilha.somaDoSetor('25'));
+    expect(linha(container, '4.3').querySelector('[data-soma]')).toBeNull();
+  });
+
+  it('cardio/geri e potenciais admissões só abrem pelo botão de editar', async () => {
+    const { usuario } = await subirFixture();
+    const nome = { name: textos.cartao.campo.potenciaisAdmissoes('4.3') };
+    expect(screen.queryByRole('textbox', nome)).toBeNull();
+    await usuario.click(screen.getByRole('button', { name: textos.planilha.editar }));
+    expect(screen.getByRole('textbox', nome)).toBeTruthy();
     await usuario.click(screen.getByRole('button', { name: textos.planilha.pronto }));
-    expect(screen.queryByRole('textbox', { name: textos.cartao.campo.hospitalistas('4.3') })).toBeNull();
+    expect(screen.queryByRole('textbox', nome)).toBeNull();
+    expect(screen.getByRole('textbox', { name: textos.cartao.campo.hospitalistas('4.3') })).toBeTruthy();
   });
 
   it('remover um apoio tira a nota e devolve a carga sem apoio na coluna "Com apoio"', async () => {

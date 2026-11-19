@@ -43,7 +43,7 @@ const temArquivos = (evento: { dataTransfer: DataTransfer | null }) =>
 
 /**
  * Topo da tela: título e data, tipo de dia, subir relatório (botão ou arrastar para qualquer lugar da página),
- * preencher à mão, editar contagens e imprimir; embaixo, a frase de privacidade, o resultado da leitura, a
+ * preencher à mão, editar cardio/geri e admissões (colunas que só existem na tela larga) e imprimir; embaixo, a frase de privacidade, o resultado da leitura, a
  * média do dia e a legenda do semáforo.
  */
 export function Cabecalho(props: PropsCabecalho) {
@@ -97,7 +97,7 @@ export function Cabecalho(props: PropsCabecalho) {
               type="button"
               aria-pressed={editando}
               onClick={props.aoAlternarEdicao}
-              className={`${BOTAO_SECUNDARIO} aria-pressed:border-tinta aria-pressed:bg-tinta aria-pressed:text-papel aria-pressed:hover:bg-tinta`}
+              className={`${BOTAO_SECUNDARIO} max-md:hidden aria-pressed:border-tinta aria-pressed:bg-tinta aria-pressed:text-papel aria-pressed:hover:bg-tinta`}
             >
               <IconeLapis />
               {editando ? textos.planilha.pronto : textos.planilha.editar}

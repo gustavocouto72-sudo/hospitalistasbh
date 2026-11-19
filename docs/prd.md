@@ -22,7 +22,7 @@ Nenhum dado fica guardado.
 
 | Objetivo | Métrica |
 |---|---|
-| Divisão simétrica | Setores no verde (até ±1 paciente por médico em relação à média), antes e depois do apoio |
+| Divisão simétrica | Setores no verde (até ±1,5 paciente por médico em relação à média), antes e depois do apoio |
 | Pouca quebra geográfica | Número de frases de apoio e de leitos de apoio sugeridos |
 | Decisão rápida | Do relatório subido até a sugestão pronta, em menos de 1 minuto |
 | Adoção | A equipe usa o site na divisão diária no lugar da planilha |
@@ -112,13 +112,14 @@ Nenhum dado fica guardado.
 
 | Diferença | Cor | Significado |
 |---|---|---|
-| Menor que −2 | Azul escuro | Muito abaixo da média |
-| De −2 a −1 | Azul claro | Abaixo da média |
-| De −1 a +1 | Verde | Na média |
-| De +1 a +2 | Amarelo | Acima da média |
-| Maior que +2 | Vermelho | Sobrecarregado |
+| Menor que −2,5 | Azul escuro | Muito abaixo da média |
+| De −2,5 a −1,5 | Azul claro | Abaixo da média |
+| De −1,5 a +1,5 | Verde | Na média |
+| De +1,5 a +2,5 | Amarelo | Acima da média |
+| Maior que +2,5 | Vermelho | Sobrecarregado |
 
-- Valores exatamente em ±1 ou ±2 caem na faixa mais próxima do verde.
+- Valores exatamente em ±1,5 ou ±2,5 caem na faixa mais próxima do verde.
+- As faixas eram ±1 e ±2 até 19/11/2026. O dono achou a margem curta demais, porque a sugestão pedia apoio por diferenças pequenas, e pediu um pouco mais de tolerância. Os limites ficam em `MARGEM_DO_VERDE` e `MARGEM_DO_AMARELO` (`src/calculo/semaforo.ts`).
 - As cores não podem ser a única pista: cada setor também mostra o número e um rótulo.
 
 ### 6.4 Sugestão de apoio

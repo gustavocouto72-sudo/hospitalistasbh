@@ -28,7 +28,7 @@ Com o painel pronto, a equipe precisa saber quais setores apoiam quais, e com qu
 **Restrições:**
 - Leitos inteiros (≥ 1 por apoio).
 - Qualquer setor pode apoiar qualquer outro, e não há teto de leitos.
-- Um apoiador não pode sair do verde para cima, ou seja, a diferença dele não pode passar de +1.
+- Um apoiador não pode sair do verde para cima, ou seja, a diferença dele não pode passar de +1,5 (a margem do verde, SPEC-03).
 - Um setor não é apoiador e apoiado ao mesmo tempo.
 - Setores `escalaPropria` não participam.
 
@@ -54,7 +54,7 @@ Com o painel pronto, a equipe precisa saber quais setores apoiam quais, e com qu
 
 ## Critérios de aceite
 
-- **Amostra de 12/11/2026, semana:** o 4.3 (11,5) e o 4.2 (11,2) estão no amarelo. A sugestão deve trazer os dois para o verde com no máximo 2 apoios, tendo como apoiadores 4.5 e/ou 6.1, que estão no azul claro. O resultado exato fica registrado no teste depois de conferido pelo dono.
+- **Amostra de 12/11/2026, semana:** o 4.3 (11,5) e o 4.2 (11,2) estão no amarelo. A sugestão deve trazer os dois para o verde com no máximo 2 apoios, tendo como apoiadores 4.5 e/ou 6.1, que estão no azul claro. Com o verde em ±1,5 (19/11/2026), a sugestão é 4.5 apoia 1 leito do 4.2 e 6.1 apoia 1 leito do 4.3; com ±1 eram 2 leitos em cada. O resultado exato fica registrado no teste depois de conferido pelo dono.
 - **Caso com 2.1 = 20 pacientes e 1 médico** (o exemplo do áudio): a sugestão tira o setor do vermelho.
 - **Setor `semMedico` com 6 pacientes:** todos os 6 leitos vão para outros setores.
 - **Painel todo no verde:** nenhum apoio.

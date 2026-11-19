@@ -7,7 +7,7 @@ import { textos } from '../textos';
 import { aplicarApoios } from './aplicar-apoios';
 import { calcularCarga } from './calcular-carga';
 import { montarQuadro } from './montar-quadro';
-import { corDoSetor } from './semaforo';
+import { MARGEM_DO_VERDE, corDoSetor } from './semaforo';
 import { sugerirApoios } from './sugerir-apoios';
 import type { Apoio, ContagemDoPosto, ModoSetor, Painel, QuadroMontado } from './tipos';
 
@@ -76,7 +76,7 @@ function conferirRestricoes(antes: Painel, apoios: readonly Apoio[]) {
   for (const s of depois.setores) {
     if (s.leitosRecebidos > 0) {
       expect(s.estado).toBe('calculado');
-      expect(s.diferenca as number).toBeLessThanOrEqual(1);
+      expect(s.diferenca as number).toBeLessThanOrEqual(MARGEM_DO_VERDE);
     }
     if (s.estado === 'escalaPropria') expect(s.leitosCedidos + s.leitosRecebidos).toBe(0);
     expect(s.leitosCedidos).toBeLessThanOrEqual(s.antes.carga);
@@ -223,24 +223,25 @@ describe('sugerirApoios', () => {
     ]);
     const r = sugerirApoios(p);
     const depois = conferirRestricoes(p, r.apoios);
-    for (const s of depois.setores) if (s.leitosRecebidos > 0) expect(s.diferenca as number).toBeLessThanOrEqual(1);
+    for (const s of depois.setores)
+      if (s.leitosRecebidos > 0) expect(s.diferenca as number).toBeLessThanOrEqual(MARGEM_DO_VERDE);
   });
 
   it('sem solução toda no verde: devolve a melhor, marca completo: false e avisa', () => {
-    // Média 10. A precisa ceder 19 para chegar a +1, e B e C aguentam só 9 cada um: A fica fora do verde de
-    // qualquer jeito. B e C começam no azul (5 por médico), então o melhor é o mínimo que leva os dois ao verde.
+    // Média 10. A precisa ceder 29 para chegar a +1,5, e B e C aguentam só 14 cada um: A fica fora do verde de
+    // qualquer jeito. B e C começam no azul (2,5 por médico), então o melhor é o mínimo que leva os dois ao verde.
     const p = painel([
-      { id: 'A', carga: 30, medicos: 1 },
-      { id: 'B', carga: 10, medicos: 2 },
-      { id: 'C', carga: 10, medicos: 2 },
+      { id: 'A', carga: 40, medicos: 1 },
+      { id: 'B', carga: 5, medicos: 2 },
+      { id: 'C', carga: 5, medicos: 2 },
     ]);
     const r = sugerirApoios(p);
     expect(r.completo).toBe(false);
     expect(r.aviso).toBe(textos.apoio.avisos.nemTodosNoVerde);
     expect(foraDoVerde(r.painelDepois)).toBeLessThan(foraDoVerde(p));
     expect(r.apoios).toEqual([
-      { de: 'B', para: 'A', leitos: 7 },
-      { de: 'C', para: 'A', leitos: 7 },
+      { de: 'B', para: 'A', leitos: 10 },
+      { de: 'C', para: 'A', leitos: 10 },
     ]);
     expect(foraDoVerde(r.painelDepois)).toBe(1);
     conferirRestricoes(p, r.apoios);

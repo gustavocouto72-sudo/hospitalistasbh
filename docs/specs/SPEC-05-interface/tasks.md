@@ -49,3 +49,12 @@
     - Topo numa faixa: tipo de dia, subir relatório (botão ou arrastar para a página), preencher à mão, editar contagens e imprimir; média, totais e legenda numa linha.
     - A recomendação de apoio fica embaixo, enxuta, em frases editáveis no lugar. Ela já vale na coluna "Com apoio" e na folha, sem o passo de aceitar e sem o seletor Antes/Depois.
     - No celular, as colunas secundárias somem, a coluna do setor fica fixa e um quadradinho da cor vai ao lado do nome.
+
+- [x] **T-05.8 — Margem do verde em ±1,5 e pacientes editáveis depois de importar (pedido do dono, 19/11/2026)**
+  - Pedido do dono: a regra de apoio trabalhava com margem curta demais, e faltava corrigir o total de pacientes depois de importar o relatório (admissões que são da cardio/geri e ainda sem interconsulta).
+  - Aceite:
+    - Verde em ±1,5 e amarelo/azul claro até ±2,5, em duas constantes (`src/calculo/semaforo.ts`); a sugestão de apoio, a legenda e a folha acompanham.
+    - Com relatório ou à mão, o campo de pacientes de cada posto fica aberto na planilha. Número diferente do relatório mostra "relatório: N" embaixo; setor com dois postos mostra a soma.
+    - O botão de editar passa a abrir só cardio/geri e potenciais admissões, e some no celular, onde essas colunas não aparecem.
+  - Falta: rodar o Playwright (`pnpm e2e`) no Mac e publicar com `vercel deploy --prod`. Feito fora do Claude Code, sem navegador do Playwright na sessão; a tela foi conferida por captura no desktop e no celular.
+
